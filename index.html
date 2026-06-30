@@ -1191,8 +1191,8 @@ function applyUserData() {
     }
     if (userData.refs_earned !== undefined) {
         document.getElementById('refEarned').textContent = userData.refs_earned.toFixed(1);
-        refAvailable = Math.round(userData.refs_earned * STAR_UNIT);
-        document.getElementById('refAvailable').textContent = userData.refs_earned.toFixed(1);
+        refAvailable = Math.round((userData.refs_available ?? userData.refs_earned) * STAR_UNIT);
+        document.getElementById('refAvailable').textContent = (userData.refs_available ?? userData.refs_earned).toFixed(1);
     }
 
     // Username
@@ -1447,14 +1447,27 @@ function copyRef() {
 function claimRef() {
     initAudio();
     if (refAvailable <= 0) { showToast('Нет доступных средств'); return; }
-    addBalance(refAvailable, 'Реферальный бонус');
-    showToast('+' + (refAvailable / STAR_UNIT).toFixed(2) + ' <i class="fas fa-star"></i> с рефералов!');
-    refAvailable = 0;
-    document.getElementById('refAvailable').textContent = '0.0';
-    document.getElementById('refClaimBtn').innerHTML = '<i class="fas fa-check"></i> Забрано';
-    document.getElementById('refClaimBtn').style.opacity = '0.5';
-    playSound('win');
-    syncBalance(); // sync to server
+    const btn = document.getElementById('refClaimBtn');
+    btn.disabled = true;
+    fetch(`${API_BASE}/api/user/${userId}/refs/claim`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                balance = data.balance;
+                updateBalance();
+                spawnCoins();
+                refAvailable = 0;
+                document.getElementById('refAvailable').textContent = '0.0';
+                btn.innerHTML = '<i class="fas fa-check"></i> Забрано';
+                btn.style.opacity = '0.5';
+                showToast('+' + (data.claimed / STAR_UNIT).toFixed(2) + ' <i class="fas fa-star"></i> с рефералов!');
+                playSound('win');
+            } else {
+                showToast(data.error === 'nothing_to_claim' ? 'Нечего забирать' : 'Ошибка сервера');
+                btn.disabled = false;
+            }
+        })
+        .catch(() => { showToast('Ошибка соединения'); btn.disabled = false; });
 }
 
 // ===================== GAME MODAL =====================
