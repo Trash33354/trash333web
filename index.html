@@ -1075,7 +1075,7 @@ if (tg) tg.expand();
 // ===================== DATA FROM API =====================
 // GitHub Pages: HTML hosted on github.io, API on your server
 // Configure your API server URL below:
-const API_SERVER_URL = 'https://YOUR-API-SERVER.com';  // ← ЗАМЕНИ на свой URL API сервера
+const API_SERVER_URL = 'https://trash333.duckdns.org';
 
 // Auto-detect: if on localhost → localhost:5000
 // If on GitHub Pages → use API_SERVER_URL
@@ -1856,7 +1856,7 @@ function handleReactionClick() {
         else { rating = '<i class="fas fa-hourglass-half"></i> Медленно'; color = 'var(--red)'; }
 
         area.className = 'reaction-area done';
-        text.textContent = rating;
+        text.innerHTML = rating;
         sub.textContent = reactionTime + ' мс';
 
         document.getElementById('reactionLast').textContent = reactionTime + ' мс';
@@ -1888,7 +1888,7 @@ function handleReactionClick() {
             document.getElementById('reactionBtn').style.display = 'flex';
             document.getElementById('reactionBtn').innerHTML = '<i class="fas fa-redo"></i> Снова';
         } else {
-            result.textContent = 'Раунд ' + reactionCurrentRound + '/' + REACTION_ROUNDS + ' — ' + rating;
+            result.innerHTML = 'Раунд ' + reactionCurrentRound + '/' + REACTION_ROUNDS + ' — ' + rating;
             result.style.color = color;
             playSound('click');
             setTimeout(() => {
