@@ -933,9 +933,6 @@ footer{
 <div style="margin-top:2.5rem">
 <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:1.2rem;text-align:center">История</h3>
 <div id="historyList" style="display:flex;flex-direction:column;gap:0.7rem">
-<div style="padding:1rem 1.2rem;background:linear-gradient(145deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:14px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
-<span style="font-size:0.85rem">Стартовый баланс</span><span style="color:var(--green);font-weight:600">+100 <i class="fas fa-star"></i></span>
-</div>
 </div>
 </div>
 </section>
@@ -1124,6 +1121,8 @@ async function loadUserData() {
         console.warn('No user_id found — using demo mode');
         showLoadingError('Не удалось получить ID пользователя из Telegram. Открой через бота.');
         isLoading = false;
+        const loader = document.getElementById('loadingOverlay');
+        if (loader) loader.classList.add('hidden');
         return;
     }
     try {
@@ -1137,6 +1136,8 @@ async function loadUserData() {
                 showLoadingError(`Ошибка сервера: ${response.status}. Проверь, запущен ли API.`);
             }
             isLoading = false;
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) loader.classList.add('hidden');
             return;
         }
         userData = await response.json();
@@ -1144,6 +1145,8 @@ async function loadUserData() {
     } catch(e) {
         console.error('Failed to load user data:', e);
         showLoadingError(`Не удалось подключиться к API: ${API_BASE}<br>Убедись, что сервер запущен.`);
+        const loader = document.getElementById('loadingOverlay');
+        if (loader) loader.classList.add('hidden');
     } finally {
         isLoading = false;
     }
@@ -1233,7 +1236,7 @@ function updateDailyButton() {
 }
 
 // Sync balance back to server after game results
-async async function syncBalance() {
+async function syncBalance() {
     if (!userId) return;
     try {
         // Calculate delta from original loaded balance
