@@ -1176,6 +1176,13 @@ function applyUserData() {
         updateDailyButton();
     }
 
+    // Welcome case status
+    if (userData.welcome_case_used || localStorage.getItem('welcomeCaseUsed_' + userId)) {
+        welcomeCaseUsed = true;
+        const btn = document.getElementById('welcomeCaseBtn');
+        if (btn) { btn.style.opacity = '0.5'; btn.disabled = true; }
+    }
+
     // Stats
     if (userData.games_played !== undefined) stats.games = userData.games_played;
     if (userData.games_won !== undefined) stats.wins = userData.games_won;
@@ -2741,11 +2748,20 @@ function pickDrop(drops) {
     return drops[0];
 }
 
+let caseSpinning = false;
 function openCase(type) {
     initAudio();
+    if (caseSpinning) { showToast('Подожди, кейс крутится...'); return; }
     if (type === 'welcome' && welcomeCaseUsed) { showToast('Приветственный кейс уже открыт!'); return; }
+    if (type === 'welcome') {
+        welcomeCaseUsed = true;
+        localStorage.setItem('welcomeCaseUsed_' + userId, '1');
+        const btn = document.getElementById('welcomeCaseBtn');
+        if (btn) { btn.style.opacity = '0.5'; btn.disabled = true; }
+    }
     if (type === 'star' && !subBalance(500)) return;
     if (type === 'premium' && !subBalance(700)) return;
+    caseSpinning = true;
     const machine = document.getElementById('caseMachine');
     const itemsEl = document.getElementById('caseItems');
     const resultEl = document.getElementById('caseResult');
@@ -2845,9 +2861,9 @@ function openCase(type) {
             selItem.style.boxShadow = '0 0 30px ' + CASE_RARITY[selectedRarity].bg;
         }
         if (type === 'welcome') {
-            welcomeCaseUsed = true;
             document.getElementById('welcomeCaseBtn').style.opacity = '0.5';
         }
+        caseSpinning = false;
         playSound(isBig ? 'win' : 'coin');
         spawnParticles(window.innerWidth/2, window.innerHeight/2);
     }, 3500);
