@@ -1070,7 +1070,10 @@ function playSound(name) {
 
 // ===================== TELEGRAM WEBAPP =====================
 const tg = window.Telegram && window.Telegram.WebApp;
-if (tg) tg.expand();
+if (tg) {
+    tg.expand();
+    tg.ready();
+}
 
 // ===================== DATA FROM API =====================
 // GitHub Pages: HTML hosted on github.io, API on your server
@@ -1084,16 +1087,10 @@ function getApiBase() {
     const urlParams = new URLSearchParams(window.location.search);
     const paramUrl = urlParams.get('api_url');
     if (paramUrl) return paramUrl;
-
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return 'http://localhost:5000';
     }
-    // GitHub Pages or any static host → use separate API server
-    if (window.location.origin.includes('github.io') || window.location.origin.includes('YOUR-USERNAME.github.io')) {
-        return API_SERVER_URL;
-    }
-    // Same origin (if API and HTML on same domain)
-    return window.location.origin;
+    return API_SERVER_URL;
 }
 
 const API_BASE = getApiBase();
