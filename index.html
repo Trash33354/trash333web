@@ -1169,6 +1169,7 @@ function applyUserData() {
     // Balance
     if (userData.balance !== undefined) {
         balance = userData.balance;
+        _syncedBalance = userData.balance;
         updateBalance();
     }
 
@@ -1236,14 +1237,12 @@ function updateDailyButton() {
 }
 
 // Sync balance back to server after game results
+let _syncedBalance = 0; // последний баланс подтверждённый сервером
 async function syncBalance() {
     if (!userId) return;
     try {
-        // Calculate delta from original loaded balance
-        const originalBalance = userData ? userData.balance : 0;
-        const delta = balance - originalBalance;
+        const delta = balance - _syncedBalance;
         if (delta === 0) return;
-
         const response = await fetch(`${API_BASE}/api/user/${userId}/balance`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -1251,8 +1250,9 @@ async function syncBalance() {
         });
         if (response.ok) {
             const result = await response.json();
-            console.log('Balance synced:', result);
-            // Update local userData to reflect server state
+            balance = result.balance;
+            _syncedBalance = result.balance;
+            updateBalance();
             if (userData) userData.balance = result.balance;
         } else {
             console.error('Sync failed:', await response.text());
@@ -1320,6 +1320,7 @@ function updateBalance() {
     document.getElementById('profileBalance').textContent = val;
     document.getElementById('navBalance').textContent = Math.floor(balance / STAR_UNIT);
 }
+let _syncTimer = null;
 function addBalance(cents, reason) {
     balance += cents;
     updateBalance();
@@ -1330,6 +1331,9 @@ function addBalance(cents, reason) {
     updateStats();
     if (reason) addHistory(reason, '+' + (cents/STAR_UNIT).toFixed(2) + ' <i class="fas fa-star"></i>', 'green');
     if (cents > 0) playSound('coin');
+    // Автосинк с сервером — откладываем на 1.5с чтобы не спамить при быстрых играх
+    clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(() => syncBalance(), 1500);
 }
 function subBalance(cents) {
     if (balance < cents) { showToast('Недостаточно звёзд!'); return false; }
@@ -1338,6 +1342,8 @@ function subBalance(cents) {
     stats.games++;
     updateStats();
     playSound('click');
+    clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(() => syncBalance(), 1500);
     return true;
 }
 function showToast(msg) {
