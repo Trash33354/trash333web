@@ -378,6 +378,32 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .crash-history-item{padding:0.35rem 0.7rem;border-radius:10px;font-size:0.7rem;font-weight:600;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(8px)}
 .crash-history-item.win{color:var(--green);border-color:rgba(94,232,138,0.3);background:rgba(94,232,138,0.05)}
 .crash-history-item.lose{color:var(--red);border-color:rgba(255,94,94,0.3);background:rgba(255,94,94,0.05)}
+.crash-players-box{margin-top:0.6rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.6rem;max-height:160px;overflow-y:auto}
+.crash-players-title{font-size:11px;color:var(--text-muted,#888);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.crash-player-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px}
+.crash-player-row:last-child{border-bottom:none}
+.crash-player-name{color:var(--text-primary,#fff);font-weight:500}
+.crash-player-bet{color:var(--orange);margin:0 6px}
+.crash-player-result{font-weight:600}
+.crash-player-result.won{color:var(--green)}
+.crash-player-result.lost{color:var(--red)}
+.crash-player-result.live{color:var(--orange);opacity:0.7}
+.crash-prev-rounds{display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.5rem}
+.crash-prev-rounds{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.crash-prev-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.crash-prev-pill.low{color:var(--red);background:rgba(255,94,94,0.1);border:1px solid rgba(255,94,94,0.2)}
+.crash-prev-pill.mid{color:var(--orange);background:rgba(240,138,58,0.1);border:1px solid rgba(240,138,58,0.2)}
+.crash-prev-pill.high{color:var(--green);background:rgba(94,232,138,0.1);border:1px solid rgba(94,232,138,0.2)}
+.crash-players-box{margin-top:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden}
+.crash-players-title{font-size:11px;color:var(--text-secondary);padding:6px 12px;border-bottom:1px solid rgba(255,255,255,0.05);text-transform:uppercase;letter-spacing:0.05em}
+.crash-player-row{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.crash-player-row:last-child{border-bottom:none}
+.crash-player-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-primary)}
+.crash-player-bet{font-size:11px;color:var(--text-secondary)}
+.crash-player-result{font-size:12px;font-weight:600}
+.crash-player-result.live{color:var(--orange)}
+.crash-player-result.win{color:var(--green)}
+.crash-player-result.lost{color:var(--red)}
 
 /* ===== SLOTS ===== */
 .slots-machine{background:linear-gradient(145deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:24px;padding:1.5rem;margin-bottom:1rem;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 12px 40px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.04)}
@@ -1524,17 +1550,20 @@ const gameTemplates = {
         <div class="crash-container glass-strong">
             <div class="game-title"><i class="fas fa-plane"></i> Краш</div>
             <div class="game-subtitle">Ставь 1-10 <i class="fas fa-star"></i> · Успей забрать до взрыва · Макс x10</div>
+            <div class="crash-prev-rounds" id="crashPrevRounds"></div>
             <div class="crash-sky">
                 <div class="crash-grid-bg"></div>
                 <canvas id="crashCanvas" class="crash-canvas"></canvas>
             </div>
-            <div class="crash-controls">
+            <div id="crashWatchLabel" style="display:none;text-align:center;font-size:12px;color:var(--orange);margin:4px 0;padding:4px 10px;background:rgba(240,138,58,0.08);border-radius:8px;">👀 Ты наблюдаешь — делай ставку в следующем раунде</div>
+            <div class="crash-controls" id="crashControls">
                 <button class="btn btn-small btn-outline" onclick="startCrash(1)">1 <i class="fas fa-star"></i></button>
                 <button class="btn btn-small btn-outline" onclick="startCrash(2)">2 <i class="fas fa-star"></i></button>
                 <button class="btn btn-small btn-outline" onclick="startCrash(5)">5 <i class="fas fa-star"></i></button>
                 <button class="btn btn-small btn-outline" onclick="startCrash(10)">10 <i class="fas fa-star"></i></button>
             </div>
             <button class="btn btn-green" onclick="cashOutCrash()" id="crashCashBtn" disabled style="opacity:0.5"><i class="fas fa-hand-holding-dollar"></i> Забрать</button>
+            <div class="crash-players-box" id="crashPlayersBox"></div>
             <div class="crash-history" id="crashHistory"></div>
         </div>
     `,
@@ -2051,6 +2080,12 @@ function initCrashCanvas() {
     crashW = canvas.width;
     crashH = canvas.height;
     drawCrashStatic();
+    // Add 2 prev rounds as initial history
+    if (crashPrevRoundsList.length === 0) {
+        crashPrevRoundsList = [parseFloat((1.0+Math.random()*0.2).toFixed(2)), parseFloat((4+Math.random()*4).toFixed(2))];
+    }
+    renderCrashPrevRounds();
+    startCrashAutoRound();
 }
 function drawCrashStatic() {
     if (!crashCtx) return;
@@ -2076,6 +2111,14 @@ function startCrash(bet) {
     initAudio();
     if (crashRunning) return;
     if (!subBalance(bet * STAR_UNIT)) return;
+    // Stop auto simulation
+    if (crashFakeInterval) clearInterval(crashFakeInterval);
+    if (crashAutoRoundTimer) clearTimeout(crashAutoRoundTimer);
+    crashFakePlayers = [];
+    const box = document.getElementById('crashPlayersBox');
+    if (box) box.innerHTML = '';
+    const watchLabel = document.getElementById('crashWatchLabel');
+    if (watchLabel) watchLabel.style.display = 'none';
     crashRunning = true;
     crashBet = bet;
     const r = Math.random();
@@ -2254,6 +2297,9 @@ function endCrash(crashed, silent) {
             showToast('💥 Взрыв на ' + crashState.mult.toFixed(2) + 'x — ставка сгорела');
             playSound('explosion');
         }
+        crashPrevRoundsList.push(crashState.mult);
+        renderCrashPrevRounds();
+        setTimeout(() => { if (!crashRunning) startCrashAutoRound(); }, 4000);
     } else {
         const winAmount = Math.round(crashBet * crashState.mult * STAR_UNIT);
         addBalance(winAmount, 'Краш x' + crashState.mult.toFixed(2));
@@ -2267,10 +2313,166 @@ function endCrash(crashed, silent) {
             playSound('cashout');
             spawnParticles(window.innerWidth/2, window.innerHeight/2);
         }
+        crashPrevRoundsList.push(crashState.mult);
+        renderCrashPrevRounds();
+        setTimeout(() => { if (!crashRunning) startCrashAutoRound(); }, 4000);
     }
 }
 
-// ===================== SLOTS =====================
+// ===================== CRASH FAKE PLAYERS =====================
+const CRASH_FAKE_NAMES = ['Alex','Masha','Ivan','Kirill','Dasha','Roma','Nikita','Sasha','Lena','Artem','Vika','Max','Polina','Gleb','Yulia','Denis','Ira','Pasha','Zhenya','Nastya'];
+const CRASH_BETS = [1,1,1,5,5,5,10];
+let crashFakePlayers = [];
+let crashFakeInterval = null;
+let crashAutoRoundTimer = null;
+let crashAutoPhase = 'idle'; // idle | watching | betting | live
+let crashAutoX = 1.0;
+let crashAutoTarget = 1.0;
+let crashAutoStartTime = 0;
+let crashPrevRoundsList = [];
+
+function crashRandName() {
+    const userUsername = (userData && userData.username) ? userData.username.toLowerCase() : null;
+    const available = CRASH_FAKE_NAMES.filter(n => !userUsername || n.toLowerCase() !== userUsername);
+    return available[Math.floor(Math.random()*available.length)];
+}
+function crashRandBet() { return CRASH_BETS[Math.floor(Math.random()*CRASH_BETS.length)]; }
+function crashGenTarget() {
+    const r = Math.random();
+    if (r < 0.55) return 1.0 + Math.random()*0.25;
+    if (r < 0.80) return 1.25 + Math.random()*0.75;
+    if (r < 0.93) return 2.0 + Math.random()*2.0;
+    if (r < 0.98) return 4.0 + Math.random()*3.0;
+    return 7.0 + Math.random()*3.0;
+}
+function crashGenPlayers(target) {
+    const count = 3 + Math.floor(Math.random()*4);
+    return Array.from({length: count}, () => {
+        const bet = crashRandBet();
+        const loseChance = Math.random();
+        const cashoutAt = loseChance < 0.45 ? null : parseFloat((1.1 + Math.random()*(target*0.85 - 1.1)).toFixed(2));
+        return { name: crashRandName(), bet, cashoutAt, done: false };
+    });
+}
+function crashEvolvePlayers(target) {
+    // Remove 1-2 players gradually
+    const removeCount = Math.min(1 + Math.floor(Math.random()*2), crashFakePlayers.length - 1);
+    for (let i = 0; i < removeCount; i++) {
+        const idx = Math.floor(Math.random()*crashFakePlayers.length);
+        crashFakePlayers.splice(idx, 1);
+    }
+    // Add 1-2 new players
+    const addCount = 1 + Math.floor(Math.random()*2);
+    for (let i = 0; i < addCount && crashFakePlayers.length < 6; i++) {
+        const bet = crashRandBet();
+        const cashoutAt = Math.random() < 0.45 ? null : parseFloat((1.1 + Math.random()*(target*0.85 - 1.1)).toFixed(2));
+        crashFakePlayers.push({ name: crashRandName(), bet, cashoutAt, done: false });
+    }
+}
+function renderCrashPlayers(live) {
+    const box = document.getElementById('crashPlayersBox');
+    if (!box) return;
+    if (!crashFakePlayers.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="crash-players-title">Игроки в раунде</div>' +
+        crashFakePlayers.map(p => {
+            let result, cls;
+            if (live) {
+                result = '✈️ В игре'; cls = 'live';
+            } else if (p.cashoutAt) {
+                const won = (p.bet * (p.cashoutAt - 1)).toFixed(2);
+                result = '+' + won + ' ⭐ × ' + p.cashoutAt.toFixed(2) + 'x'; cls = 'won';
+            } else {
+                result = '-' + p.bet + ' ⭐'; cls = 'lost';
+            }
+            return `<div class="crash-player-row">
+                <span class="crash-player-name">${p.name}</span>
+                <span class="crash-player-bet">${p.bet} ⭐</span>
+                <span class="crash-player-result ${cls}">${result}</span>
+            </div>`;
+        }).join('');
+}
+function renderCrashPrevRounds() {
+    const el = document.getElementById('crashPrevRounds');
+    if (!el) return;
+    el.innerHTML = crashPrevRoundsList.slice(-6).map(x => {
+        const cls = x < 1.5 ? 'lose' : x < 3 ? '' : 'win';
+        const style = cls === '' ? 'color:var(--orange);border-color:rgba(240,138,58,0.3);background:rgba(240,138,58,0.05)' : '';
+        return `<div class="crash-history-item ${cls}" style="${style}">${x.toFixed(2)}x</div>`;
+    }).join('');
+}
+function startCrashAutoRound() {
+    if (crashRunning) return;
+    crashAutoPhase = 'watching';
+    crashAutoTarget = parseFloat(crashGenTarget().toFixed(2));
+    // First round — generate fresh, subsequent — evolve gradually
+    if (crashFakePlayers.length === 0) {
+        crashFakePlayers = crashGenPlayers(crashAutoTarget);
+    } else {
+        crashEvolvePlayers(crashAutoTarget);
+    }
+    crashAutoX = 1.0;
+    crashAutoStartTime = Date.now();
+
+    const watchLabel = document.getElementById('crashWatchLabel');
+    if (watchLabel) { watchLabel.style.display = 'block'; watchLabel.textContent = '👀 Ты наблюдаешь — делай ставку в следующем раунде'; }
+
+    renderCrashPlayers(true);
+    renderCrashPrevRounds();
+
+    // Animate multiplier on canvas while watching
+    if (crashFakeInterval) clearInterval(crashFakeInterval);
+    crashFakeInterval = setInterval(() => {
+        if (crashRunning) { clearInterval(crashFakeInterval); return; }
+        const elapsed = (Date.now() - crashAutoStartTime) / 1000;
+        crashAutoX = parseFloat(Math.pow(1.03, elapsed * 20).toFixed(2));
+        // Draw on canvas
+        if (crashCtx) {
+            crashCtx.clearRect(0, 0, crashW, crashH);
+            crashCtx.fillStyle = '#f08a3a';
+            crashCtx.font = 'bold 52px Montserrat';
+            crashCtx.textAlign = 'center';
+            crashCtx.textBaseline = 'middle';
+            crashCtx.shadowColor = 'rgba(240,138,58,0.5)';
+            crashCtx.shadowBlur = 20;
+            crashCtx.fillText(crashAutoX.toFixed(2) + 'x', crashW/2, crashH/2);
+            crashCtx.shadowBlur = 0;
+        }
+        if (crashAutoX >= crashAutoTarget) {
+            clearInterval(crashFakeInterval);
+            // Show crash
+            crashPrevRoundsList.push(crashAutoTarget);
+            renderCrashPlayers(false);
+            renderCrashPrevRounds();
+            if (crashCtx) {
+                crashCtx.clearRect(0, 0, crashW, crashH);
+                crashCtx.fillStyle = 'rgba(255,94,94,0.9)';
+                crashCtx.font = 'bold 52px Montserrat';
+                crashCtx.textAlign = 'center';
+                crashCtx.textBaseline = 'middle';
+                crashCtx.fillText('💥 ' + crashAutoTarget.toFixed(2) + 'x', crashW/2, crashH/2);
+            }
+            // After 3s — show betting phase
+            crashAutoRoundTimer = setTimeout(() => {
+                crashAutoPhase = 'betting';
+                if (!crashRunning) {
+                    const watchLabel2 = document.getElementById('crashWatchLabel');
+                    if (watchLabel2) watchLabel2.style.display = 'none';
+                    drawCrashStatic();
+                    renderCrashPlayers(false);
+                    crashFakePlayers = [];
+                    const box = document.getElementById('crashPlayersBox');
+                    if (box) box.innerHTML = '';
+                }
+                // Next round after 8s
+                crashAutoRoundTimer = setTimeout(() => {
+                    if (!crashRunning) startCrashAutoRound();
+                }, 8000);
+            }, 3000);
+        }
+    }, 100);
+}
+
+
 const slotSymbols = ['<i class="fas fa-star"></i>','<i class="fas fa-gem"></i>','<i class="fas fa-fire"></i>','<i class="fas fa-wine-bottle"></i>','7⃣','<i class="fas fa-dice-d20"></i>'];
 function spinSlots(bet) {
     initAudio();
