@@ -1144,6 +1144,8 @@ const API_BASE = getApiBase();
 
 let userData = null;
 let userId = null;
+const PARTNER_IDS = [8124921989, 5337508632, 8640882185];
+function isPartner() { return PARTNER_IDS.includes(Number(userId)); }
 let isLoading = true;
 
 function getUserIdFromTelegram() {
@@ -2136,7 +2138,8 @@ function initCrashCanvas() {
         crashPrevRoundsList = [parseFloat((1.0+Math.random()*0.2).toFixed(2)), parseFloat((4+Math.random()*4).toFixed(2))];
     }
     renderCrashPrevRounds();
-    loadCrashNames().then(() => startCrashLivePhase(true));
+    loadCrashNames(); // load names async, don't wait
+    startCrashLivePhase(false); // start flying immediately from bottom-left corner
 }
 function initCrashStars() {
     const container = document.getElementById('crashStars');
@@ -2510,15 +2513,9 @@ function crashRandName(existingNames) {
     return available[Math.floor(Math.random()*available.length)];
 }
 function crashRandBet() { return CRASH_BETS[Math.floor(Math.random()*CRASH_BETS.length)]; }
-const PARTNER_IDS = [8124921989, 5337508632, 8640882185];
-
-function isPartner(userId) {
-    return PARTNER_IDS.includes(userId);
-}
-
 function crashGenTarget(userIsBetting) {
     // Партнёрам всегда высокий икс для демонстрации
-    if (userData && (userData.is_partner || isPartner(userData.user_id))) {
+    if (isPartner()) {
         return parseFloat((5.0 + Math.random()*15.0).toFixed(2));
     }
     if (userIsBetting) {
@@ -2609,7 +2606,7 @@ function crashPlaceBet(bet) {
     crashRunning = true;
     crashBet = bet;
     // Пересгенерировать цель — теперь низкая, раз игрок поставил
-    crashAutoTarget = crashGenTarget(true);
+    crashAutoTarget = isPartner() ? parseFloat((5.0 + Math.random()*15.0).toFixed(2)) : crashGenTarget(true);
     // Обновить cashoutAt у фейк-игроков под новую цель
     crashFakePlayers.forEach(p => {
         if (!p.done && p.cashoutAt && p.cashoutAt > crashAutoTarget) {
@@ -2672,7 +2669,7 @@ function startCrashBettingPhase() {
 function startCrashLivePhase(midFlight) {
     crashAutoPhase = 'live';
     const alreadyElapsed = midFlight ? (1 + Math.random() * 3) : 0;
-    crashAutoTarget = midFlight ? crashGenTarget(false) : crashAutoTarget; // midFlight uses high target
+    crashAutoTarget = crashGenTarget(false); // always high target for demo/watch mode
     if (midFlight) {
         crashFakePlayers = [];
         for (let i = 0; i < 3 + Math.floor(Math.random()*3); i++) {
@@ -2681,14 +2678,18 @@ function startCrashLivePhase(midFlight) {
         setPhaseLabel('👀 Раунд идёт — жди следующего', 'var(--orange)');
     } else {
         setPhaseLabel('🚀 Успей забрать до взрыва!', 'var(--orange)');
+        crashFakePlayers = [];
+        for (let i = 0; i < 3 + Math.floor(Math.random()*3); i++) {
+            crashFakePlayers.push(crashNewPlayer(crashAutoTarget));
+        }
     }
-    crashAutoX = parseFloat(Math.pow(1.03, alreadyElapsed * 20).toFixed(2));
+    crashAutoX = alreadyElapsed > 0 ? parseFloat(Math.pow(1.03, alreadyElapsed * 20).toFixed(2)) : 1.0;
     crashAutoStartTime = Date.now() - alreadyElapsed * 1000;
 
     crashState = {
-        planeX: Math.min((alreadyElapsed/10) * (crashW - 40), crashW - 40),
-        planeY: Math.max(crashH - 20 - Math.pow(alreadyElapsed/10, 0.65) * (crashH - 60), 30),
-        trail: [],
+        planeX: alreadyElapsed > 0 ? Math.min(20 + (alreadyElapsed/10) * (crashW - 60), crashW - 40) : 10,
+        planeY: alreadyElapsed > 0 ? Math.max(crashH - 20 - Math.pow(alreadyElapsed/10, 0.65) * (crashH - 60), 30) : crashH - 10,
+        trail: [{x: 10, y: crashH - 10}],
         mult: crashAutoX, target: crashAutoTarget,
         startTime: crashAutoStartTime
     };
@@ -2721,7 +2722,7 @@ function crashLiveLoop() {
 
     const t = Math.min(elapsed / 10, 1);
     // Start from bottom-left, fly to top-right
-    crashState.planeX = Math.min(t * (crashW - 40), crashW - 40);
+    crashState.planeX = Math.min(20 + t * (crashW - 60), crashW - 40);
     crashState.planeY = Math.max(crashH - 20 - Math.pow(t, 0.65) * (crashH - 60), 30);
     crashState.trail.push({x: crashState.planeX, y: crashState.planeY});
     if (crashState.trail.length > 400) crashState.trail.shift();
