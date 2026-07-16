@@ -1061,6 +1061,17 @@ footer{
 .out-btn:hover{background:rgba(240,138,58,.1);border-color:rgba(240,138,58,.35)}
 .out-btn.selected{background:rgba(240,138,58,.18);border-color:var(--orange);box-shadow:0 3px 14px rgba(240,138,58,.2)}
 .out-btn.locked{opacity:.35;pointer-events:none}
+.bet-placed-banner{background:rgba(94,232,138,.08);border:1px solid rgba(94,232,138,.25);border-radius:12px;padding:.55rem .9rem;font-size:.68rem;color:var(--green);text-align:center;margin-bottom:.7rem;letter-spacing:.5px}
+.market-info-btn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--text-dim);font-size:.62rem;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:.4rem;transition:all .2s;font-style:italic;font-family:Georgia,serif}
+.market-info-btn:hover{background:rgba(240,138,58,.15);border-color:var(--orange);color:var(--orange)}
+.market-info-popup{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
+.market-info-popup.open{opacity:1;pointer-events:all}
+.market-info-box{background:linear-gradient(145deg,rgba(18,18,26,.98),rgba(10,10,16,.99));border:1px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:1.5rem 1.4rem 2rem;width:100%;max-width:480px}
+.market-info-box-title{font-size:.8rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:.8rem}
+.market-info-box-desc{font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:1rem}
+.market-info-box-outcomes{font-size:.72rem;color:var(--text-dim);line-height:1.7}
+.market-info-box-outcomes b{color:var(--text)}
+.market-info-close{width:100%;padding:.75rem;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;margin-top:.5rem}
 .out-label{font-size:.62rem;color:var(--text-dim);text-align:center;line-height:1.3}
 .out-kf{font-size:.88rem;font-weight:700;color:var(--orange)}
 .out-kf.selected{color:var(--text)}
@@ -4381,6 +4392,49 @@ function endTower(silent) {
 let betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
 let betsRequests = JSON.parse(localStorage.getItem('trash_requests') || '[]');
 let myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
+let placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
+
+function savePlacedEvents() {
+    localStorage.setItem('trash_placed_events', JSON.stringify([...placedEvents]));
+}
+
+const MARKET_INFO = {
+    'winner': {
+        desc: 'Выбери команду или исход, который победит в этом матче.',
+        outcomes: 'П1 — победа первой команды\nНичья — ничья\nП2 — победа второй команды'
+    },
+    'total': {
+        desc: 'Угадай, сколько голов/очков/сетов будет забито за весь матч.',
+        outcomes: 'Больше (ТБ) — итоговый счёт превысит указанную цифру\nМеньше (ТМ) — итоговый счёт будет ниже указанной цифры'
+    },
+    'handicap': {
+        desc: 'Фора выравнивает шансы: одной команде добавляют преимущество, другой — убирают.',
+        outcomes: 'Ф1(−1) — первая команда должна победить с разницей больше 1\nФ2(+1) — второй достаточно не проиграть больше чем на 1'
+    },
+    'extra': {
+        desc: 'Дополнительный рынок с особым условием — читай описание варианта.',
+        outcomes: 'Каждый вариант описан в кнопке — выбери тот, в который веришь'
+    }
+};
+
+function showMarketInfo(mk, name, outcomes) {
+    const info = MARKET_INFO[mk] || { desc: 'Выбери исход, в который веришь больше всего.', outcomes: '' };
+    document.getElementById('marketInfoTitle').textContent = name;
+    document.getElementById('marketInfoDesc').textContent = info.desc;
+    const outEl = document.getElementById('marketInfoOutcomes');
+    if (outcomes && outcomes.length) {
+        outEl.innerHTML = outcomes.map(o => `<b>${o.label}</b> — кэф ${o.kf.toFixed(2)}<br>`).join('');
+    } else {
+        outEl.innerHTML = info.outcomes.split('\n').map(l => `${l}<br>`).join('');
+    }
+    document.getElementById('marketInfoPopup').classList.add('open');
+}
+
+function closeMarketInfo(e) {
+    if (e.target === document.getElementById('marketInfoPopup')) {
+        document.getElementById('marketInfoPopup').classList.remove('open');
+    }
+}
 // betslip: { eventId, markets: { marketId: {label, outcome, kf} } }
 let betslip = {};
 
@@ -4423,7 +4477,8 @@ function renderEventsForTab(tab) {
 function buildEventCard(ev) {
     const markets = ev.markets || {};
     const mKeys = Object.keys(markets);
-    const bs = betslip[ev.id] || {};
+    const isPlaced = placedEvents.has(ev.id);
+    const bs = isPlaced ? {} : (betslip[ev.id] || {});
     const filled = mKeys.filter(k => bs[k]);
     const total = mKeys.length;
     const pct = total ? Math.round(filled.length / total * 100) : 0;
@@ -4444,39 +4499,40 @@ function buildEventCard(ev) {
     mKeys.forEach(mk => {
         const m = markets[mk];
         const sel = bs[mk];
-        marketsHtml += buildMarketHtml(ev.id, mk, m, sel);
+        marketsHtml += buildMarketHtml(ev.id, mk, m, sel, isPlaced);
     });
 
     card.innerHTML = `
         <div class="bet-card-meta">${metaHtml}</div>
         <div class="bet-card-title">${ev.title}</div>
         <div class="bet-card-sub">${ev.sub || ''}</div>
-        <div class="bet-progress">
-            <div class="bet-progress-bar"><div class="bet-progress-fill" style="width:${pct}%"></div></div>
-            <div class="bet-progress-label">${filled.length}/${total} рынков выбрано</div>
-        </div>
+        ${isPlaced ? '<div class="bet-placed-banner"><i class="fas fa-check-circle"></i> Ставка на это событие уже сделана</div>' : `<div class="bet-progress"><div class="bet-progress-bar"><div class="bet-progress-fill" style="width:${pct}%"></div></div><div class="bet-progress-label">${filled.length}/${total} рынков выбрано</div></div>`}
         ${marketsHtml}
     `;
     return card;
 }
 
-function buildMarketHtml(evId, mk, m, sel) {
+function buildMarketHtml(evId, mk, m, sel, isPlaced) {
     const outcomes = m.outcomes || [];
-    const isOpen = true;
     let outHtml = '';
     const cols = outcomes.length === 2 ? 'cols2' : outcomes.length === 3 ? 'cols3' : 'cols2';
     outcomes.forEach((o, i) => {
         const isSel = sel && sel.outIdx === i;
-        outHtml += `<div class="out-btn${isSel?' selected':''}" onclick="selectOutcome('${evId}','${mk}',${i},'${o.label}',${o.kf})" id="out-${evId}-${mk}-${i}">
+        const lockedClass = isPlaced ? ' locked' : '';
+        outHtml += `<div class="out-btn${isSel?' selected':''}${lockedClass}" ${isPlaced ? '' : `onclick="selectOutcome('${evId}','${mk}',${i},'${o.label}',${o.kf})"`} id="out-${evId}-${mk}-${i}">
             <span class="out-label">${o.label}</span>
             <span class="out-kf${isSel?' selected':''}">${o.kf.toFixed(2)}</span>
         </div>`;
     });
+    const outcomesData = JSON.stringify(m.outcomes||[]).replace(/'/g,"\\'");
     return `<div class="bet-market">
         <div class="bet-market-divider"></div>
         <div class="bet-market-hdr" onclick="toggleMarketBlock('mb-${evId}-${mk}','mchev-${evId}-${mk}')">
             <span class="bet-market-name">${m.name}</span>
-            <i class="fas fa-chevron-down bet-market-chev open" id="mchev-${evId}-${mk}"></i>
+            <span style="display:flex;align-items:center;gap:.4rem;margin-left:auto">
+                <span class="market-info-btn" onclick="event.stopPropagation();showMarketInfo('${mk}','${m.name}',${JSON.stringify(m.outcomes||[])})">i</span>
+                <i class="fas fa-chevron-down bet-market-chev open" id="mchev-${evId}-${mk}"></i>
+            </span>
         </div>
         <div class="bet-market-body open" id="mb-${evId}-${mk}">
             <div class="outcomes-grid ${cols}">${outHtml}</div>
@@ -4704,6 +4760,10 @@ function placeBet() {
             ev.bets.push({ betId: bet.id, markets: item.markets, stake, potential });
         }
     });
+
+    // Запоминаем что на эти события уже поставлено
+    betItems.forEach(item => placedEvents.add(item.eventId));
+    savePlacedEvents();
 
     saveBetsData();
     updateBetsStats();
@@ -5144,5 +5204,14 @@ if (document.readyState === 'loading') {
 }
 
 </script>
+<!-- Market info popup -->
+<div class="market-info-popup" id="marketInfoPopup" onclick="closeMarketInfo(event)">
+<div class="market-info-box">
+<div class="market-info-box-title" id="marketInfoTitle"></div>
+<div class="market-info-box-desc" id="marketInfoDesc"></div>
+<div class="market-info-box-outcomes" id="marketInfoOutcomes"></div>
+<button class="market-info-close" onclick="document.getElementById('marketInfoPopup').classList.remove('open')">Понятно</button>
+</div>
+</div>
 </body>
 </html>
