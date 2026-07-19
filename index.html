@@ -1934,6 +1934,10 @@ function showLoadingError(msg) {
 
 function applyUserData() {
     if (!userData) return;
+    // Init bets system now that we have userId
+    if (typeof initBetsDelayed === 'function' && userId) {
+        initBetsDelayed();
+    }
     // Hide loading overlay
     const loader = document.getElementById('loadingOverlay');
     if (loader) loader.classList.add('hidden');
@@ -4392,7 +4396,7 @@ function endTower(silent) {
 let betsEvents = [];
 let betsRequests = [];
 let myBets = [];
-let placedEvents = new Set();
+let placedEvents = new Set(); // per-user! only THIS user's placed bets
 
 // Load from server first, fallback to localStorage
 async function loadBetsData() {
@@ -4402,7 +4406,6 @@ async function loadBetsData() {
             const data = await evRes.json();
             if (data.events) betsEvents = data.events;
         } else {
-            // Fallback to localStorage
             betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
         }
     } catch(e) {
@@ -4434,20 +4437,30 @@ async function loadBetsData() {
             myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
         }
 
+        // Load placed events for THIS USER ONLY from server
+        // Server must return only events THIS user has bet on
         try {
             const peRes = await fetch(`${API_BASE}/api/user/${userId}/placed-events`);
             if (peRes.ok) {
                 const data = await peRes.json();
                 if (data.events) placedEvents = new Set(data.events);
+                else placedEvents = new Set();
             } else {
-                placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
+                // Fallback: derive from myBets (only active bets)
+                placedEvents = new Set();
+                myBets.filter(b => b.status === 'active').forEach(b => {
+                    b.items.forEach(item => placedEvents.add(item.eventId));
+                });
             }
         } catch(e) {
-            placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
+            placedEvents = new Set();
+            myBets.filter(b => b.status === 'active').forEach(b => {
+                b.items.forEach(item => placedEvents.add(item.eventId));
+            });
         }
     } else {
         myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
-        placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
+        placedEvents = new Set();
     }
 
     // Refresh UI if on bets page
@@ -4461,13 +4474,37 @@ async function loadBetsData() {
 }
 
 // Call load on init
-loadBetsData();
-// Refresh every 10 seconds when on bets page
-setInterval(() => {
-    if (document.getElementById('page-bets')?.classList.contains('active')) {
-        loadBetsData();
-    }
-}, 10000);
+// Delayed init — wait for userId to be loaded from API
+function initBetsDelayed() {
+    // Clean slate: derive placedEvents from myBets only (personal)
+    placedEvents = new Set();
+    myBets.filter(b => b.status === 'active').forEach(b => {
+        b.items.forEach(item => placedEvents.add(item.eventId));
+    });
+    loadBetsData();
+    // Refresh every 10 seconds when on bets page
+    setInterval(() => {
+        if (document.getElementById('page-bets')?.classList.contains('active')) {
+            loadBetsData();
+        }
+    }, 10000);
+}
+// Call after user data is loaded (or immediately if no userId needed)
+if (userId) initBetsDelayed();
+else {
+    // Wait for loadUserData to set userId, then init
+    const checkInterval = setInterval(() => {
+        if (userId) {
+            clearInterval(checkInterval);
+            initBetsDelayed();
+        }
+    }, 500);
+    // Fallback: init anyway after 3 seconds even without userId
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!userId) loadBetsData(); // load from localStorage fallback
+    }, 3000);
+}
 
 function savePlacedEvents() {
     localStorage.setItem('trash_placed_events', JSON.stringify([...placedEvents]));
