@@ -4385,7 +4385,7 @@ function endTower(silent) {
 }
 
 // ============================================================
-// BETTING SYSTEM — Server-synced version
+// BETTING SYSTEM
 // ============================================================
 
 // ---- Data stores ----
@@ -4393,79 +4393,62 @@ let betsEvents = [];
 let betsRequests = [];
 let myBets = [];
 let placedEvents = new Set();
-let betsDataLoaded = false;
 
-// ---- Server API helpers ----
-async function apiGet(path) {
-    try {
-        const r = await fetch(`${API_BASE}${path}`);
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return await r.json();
-    } catch(e) {
-        console.error('API GET failed:', path, e);
-        return null;
-    }
-}
-
-async function apiPost(path, body) {
-    try {
-        const r = await fetch(`${API_BASE}${path}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-        });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return await r.json();
-    } catch(e) {
-        console.error('API POST failed:', path, e);
-        return null;
-    }
-}
-
-async function apiDelete(path) {
-    try {
-        const r = await fetch(`${API_BASE}${path}`, {method: 'DELETE'});
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return await r.json();
-    } catch(e) {
-        console.error('API DELETE failed:', path, e);
-        return null;
-    }
-}
-
-// ---- Load all bets data from server ----
+// Load from server first, fallback to localStorage
 async function loadBetsData() {
-    if (betsDataLoaded) return;
-
-    // Load events (shared for all users)
-    const eventsData = await apiGet('/api/events');
-    if (eventsData && Array.isArray(eventsData.events)) {
-        betsEvents = eventsData.events;
+    try {
+        const evRes = await fetch(`${API_BASE}/api/events`);
+        if (evRes.ok) {
+            const data = await evRes.json();
+            if (data.events) betsEvents = data.events;
+        } else {
+            // Fallback to localStorage
+            betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
+        }
+    } catch(e) {
+        betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
     }
 
-    // Load my bets (user-specific)
+    try {
+        const reqRes = await fetch(`${API_BASE}/api/requests`);
+        if (reqRes.ok) {
+            const data = await reqRes.json();
+            if (data.requests) betsRequests = data.requests;
+        } else {
+            betsRequests = JSON.parse(localStorage.getItem('trash_requests') || '[]');
+        }
+    } catch(e) {
+        betsRequests = JSON.parse(localStorage.getItem('trash_requests') || '[]');
+    }
+
     if (userId) {
-        const myBetsData = await apiGet(`/api/user/${userId}/bets`);
-        if (myBetsData && Array.isArray(myBetsData.bets)) {
-            myBets = myBetsData.bets;
+        try {
+            const betsRes = await fetch(`${API_BASE}/api/user/${userId}/bets`);
+            if (betsRes.ok) {
+                const data = await betsRes.json();
+                if (data.bets) myBets = data.bets;
+            } else {
+                myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
+            }
+        } catch(e) {
+            myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
         }
 
-        // Load placed events tracking
-        const placedData = await apiGet(`/api/user/${userId}/placed-events`);
-        if (placedData && Array.isArray(placedData.events)) {
-            placedEvents = new Set(placedData.events);
+        try {
+            const peRes = await fetch(`${API_BASE}/api/user/${userId}/placed-events`);
+            if (peRes.ok) {
+                const data = await peRes.json();
+                if (data.events) placedEvents = new Set(data.events);
+            } else {
+                placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
+            }
+        } catch(e) {
+            placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
         }
+    } else {
+        myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
+        placedEvents = new Set(JSON.parse(localStorage.getItem('trash_placed_events') || '[]'));
     }
-
-    // Load requests (partners see all pending)
-    if (isPartner()) {
-        const reqData = await apiGet('/api/requests');
-        if (reqData && Array.isArray(reqData.requests)) {
-            betsRequests = reqData.requests;
-        }
-    }
-
-    betsDataLoaded = true;
 
     // Refresh UI if on bets page
     const activeTab = document.querySelector('.bets-section.active');
@@ -4477,56 +4460,19 @@ async function loadBetsData() {
     updateBetsStats();
 }
 
-// ---- Save helpers (server + local fallback) ----
-async function saveEventsToServer() {
-    // Events are saved individually via API, not bulk
-    // This function is for compatibility
-}
-
-async function saveMyBetsToServer() {
-    if (!userId) return;
-    await apiPost(`/api/user/${userId}/bets`, {bets: myBets});
-}
-
-async function savePlacedEventsToServer() {
-    if (!userId) return;
-    await apiPost(`/api/user/${userId}/placed-events`, {events: [...placedEvents]});
-}
-
-// Legacy compatibility: keep localStorage as cache backup
-function saveBetsDataLocal() {
-    try {
-        localStorage.setItem('trash_events_cache', JSON.stringify(betsEvents));
-        localStorage.setItem('trash_requests_cache', JSON.stringify(betsRequests));
-        localStorage.setItem('trash_mybets_cache', JSON.stringify(myBets));
-        localStorage.setItem('trash_placed_events_cache', JSON.stringify([...placedEvents]));
-    } catch(e) {}
-}
-
-function loadBetsDataLocal() {
-    try {
-        const ev = localStorage.getItem('trash_events_cache');
-        const req = localStorage.getItem('trash_requests_cache');
-        const mb = localStorage.getItem('trash_mybets_cache');
-        const pe = localStorage.getItem('trash_placed_events_cache');
-        if (ev && betsEvents.length === 0) betsEvents = JSON.parse(ev);
-        if (req && betsRequests.length === 0) betsRequests = JSON.parse(req);
-        if (mb && myBets.length === 0) myBets = JSON.parse(mb);
-        if (pe && placedEvents.size === 0) placedEvents = new Set(JSON.parse(pe));
-    } catch(e) {}
-}
+// Call load on init
+loadBetsData();
+// Refresh every 10 seconds when on bets page
+setInterval(() => {
+    if (document.getElementById('page-bets')?.classList.contains('active')) {
+        loadBetsData();
+    }
+}, 10000);
 
 function savePlacedEvents() {
-    savePlacedEventsToServer();
-    saveBetsDataLocal();
+    localStorage.setItem('trash_placed_events', JSON.stringify([...placedEvents]));
 }
 
-function saveBetsData() {
-    saveMyBetsToServer();
-    saveBetsDataLocal();
-}
-
-// ---- Market info ----
 const MARKET_INFO = {
     'winner': {
         desc: 'Выбери команду или исход, который победит в этом матче.',
@@ -4564,9 +4510,14 @@ function closeMarketInfo(e) {
         document.getElementById('marketInfoPopup').classList.remove('open');
     }
 }
-
 // betslip: { eventId, markets: { marketId: {label, outcome, kf} } }
 let betslip = {};
+
+function saveBetsData() {
+    localStorage.setItem('trash_events', JSON.stringify(betsEvents));
+    localStorage.setItem('trash_requests', JSON.stringify(betsRequests));
+    localStorage.setItem('trash_mybets', JSON.stringify(myBets.slice(0,100)));
+}
 
 // ---- Sport tab ----
 function switchBetsTab(tab) {
@@ -4593,6 +4544,7 @@ function renderEventsForTab(tab) {
         return;
     }
     evs.forEach(ev => container.appendChild(buildEventCard(ev)));
+    // hide empty hint for custom
     const hint = document.getElementById('custom-empty-hint');
     if (hint) hint.style.display = evs.length > 0 ? 'none' : 'block';
 }
@@ -4647,6 +4599,7 @@ function buildMarketHtml(evId, mk, m, sel, isPlaced) {
             <span class="out-kf${isSel?' selected':''}">${o.kf.toFixed(2)}</span>
         </div>`;
     });
+    const outcomesData = JSON.stringify(m.outcomes||[]).replace(/'/g,"\\'");
     return `<div class="bet-market">
         <div class="bet-market-divider"></div>
         <div class="bet-market-hdr" onclick="toggleMarketBlock('mb-${evId}-${mk}','mchev-${evId}-${mk}')">
@@ -4675,9 +4628,11 @@ function selectOutcome(evId, mk, outIdx, label, kf) {
     if (!betslip[evId]) betslip[evId] = {};
     const prev = betslip[evId][mk];
     if (prev && prev.outIdx === outIdx) {
+        // deselect
         delete betslip[evId][mk];
         document.getElementById(`out-${evId}-${mk}-${outIdx}`)?.classList.remove('selected');
     } else {
+        // deselect previous in same market
         if (prev !== undefined) {
             document.getElementById(`out-${evId}-${mk}-${prev.outIdx}`)?.classList.remove('selected');
         }
@@ -4713,9 +4668,11 @@ function updateBetslipFloat() {
     const fl = document.getElementById('betslipFloat');
     const countEl = document.getElementById('bs-float-count');
     const subEl = document.getElementById('bs-float-sub');
+    // count events with at least 1 selection
     const evIds = Object.keys(betslip).filter(id => Object.keys(betslip[id]).length > 0);
     if (evIds.length === 0) { fl.classList.add('hidden'); return; }
     fl.classList.remove('hidden');
+    // count total selections
     let total = 0, filled = 0;
     evIds.forEach(id => {
         const ev = betsEvents.find(e => e.id === id);
@@ -4794,6 +4751,7 @@ function calcBetslip() {
         return;
     }
 
+    // Check if ALL selected events are fully filled
     const allEvIds = Object.keys(betslip).filter(id => Object.keys(betslip[id]).length > 0);
     const notFull = allEvIds.filter(id => !evIds.includes(id));
     if (notFull.length > 0) {
@@ -4807,6 +4765,8 @@ function calcBetslip() {
     reqNote.style.display = 'none';
     placeBtn.disabled = false;
 
+    // Calc total kf — use event's winMode
+    // For single event bets use that event's setting; for multi-event use product
     let totalKf = 1;
     evIds.forEach(id => {
         const ev = betsEvents.find(e => e.id === id);
@@ -4825,7 +4785,7 @@ function calcBetslip() {
 }
 
 // ---- Place bet ----
-async function placeBet() {
+function placeBet() {
     const stake = parseFloat(document.getElementById('bs-stake').value) || 0;
     if (stake <= 0) { showToast('Введи сумму ставки'); return; }
     const stakeCents = Math.round(stake * STAR_UNIT);
@@ -4863,19 +4823,18 @@ async function placeBet() {
         stake,
         totalKf,
         potential,
-        status: 'active'
+        status: 'active' // active | won | lost | half
     };
+    myBets.unshift(bet);
 
     // Save to server
     if (userId) {
-        const result = await apiPost(`/api/user/${userId}/bets`, {bet});
-        if (result && result.success) {
-            // Use server-assigned ID if provided
-            if (result.betId) bet.id = result.betId;
-        }
+        fetch(`${API_BASE}/api/user/${userId}/bets`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({bet})
+        }).catch(() => {});
     }
-
-    myBets.unshift(bet);
 
     // Register bet on event for later payout
     betItems.forEach(item => {
@@ -4886,6 +4845,7 @@ async function placeBet() {
         }
     });
 
+    // Запоминаем что на эти события уже поставлено
     betItems.forEach(item => placedEvents.add(item.eventId));
     savePlacedEvents();
 
@@ -4901,6 +4861,7 @@ async function placeBet() {
 
 function clearBetslip() {
     betslip = {};
+    // Re-render current tab to clear selections
     const activeTab = document.querySelector('.bets-section.active');
     if (activeTab) {
         const tab = activeTab.id.replace('bets-', '');
@@ -4964,7 +4925,7 @@ function openSuggestModal(cat) {
 function closeSuggestModal() { document.getElementById('sgModal').classList.remove('open'); }
 function closeSgOnBg(e) { if (e.target===document.getElementById('sgModal')) closeSuggestModal(); }
 
-async function submitSuggest() {
+function submitSuggest() {
     const title = document.getElementById('sg-title').value.trim();
     const participants = document.getElementById('sg-participants').value.trim();
     if (!title || !participants) { showToast('Заполни название и участников!'); return; }
@@ -4983,15 +4944,16 @@ async function submitSuggest() {
         status: 'pending',
         date: new Date().toISOString()
     };
-
-    // Save to server
-    const result = await apiPost('/api/requests', req);
-    if (result && result.success) {
-        if (result.requestId) req.id = result.requestId;
-    }
-
     betsRequests.unshift(req);
     saveBetsData();
+
+    // Save to server
+    fetch(`${API_BASE}/api/requests`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(req)
+    }).catch(() => {});
+
     closeSuggestModal();
     ['sg-title','sg-participants','sg-date','sg-desc','sg-o1','sg-o2','sg-o3','sg-src'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
     showToast('<i class="fas fa-paper-plane" style="color:var(--orange)"></i> Заявка отправлена партнёрам!');
@@ -5045,27 +5007,30 @@ function renderPpEvents() {
     });
 }
 
-async function toggleEventLive(evId) {
+function toggleEventLive(evId) {
     const ev = betsEvents.find(e=>e.id===evId);
     if (!ev) return;
     ev.live = !ev.live;
+    saveBetsData();
 
     // Update on server
-    await apiPost(`/api/events/${evId}`, {live: ev.live});
+    fetch(`${API_BASE}/api/events/${evId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({live: ev.live})
+    }).catch(() => {});
 
-    saveBetsDataLocal();
     renderPpEvents();
     renderEventsForCurrentTab();
 }
-
-async function deleteEvent(evId) {
+function deleteEvent(evId) {
     if (!confirm('Удалить событие?')) return;
+    betsEvents = betsEvents.filter(e=>e.id!==evId);
+    saveBetsData();
 
     // Delete from server
-    await apiDelete(`/api/events/${evId}`);
+    fetch(`${API_BASE}/api/events/${evId}`, {method: 'DELETE'}).catch(() => {});
 
-    betsEvents = betsEvents.filter(e=>e.id!==evId);
-    saveBetsDataLocal();
     renderPpEvents();
     renderEventsForCurrentTab();
 }
@@ -5095,35 +5060,36 @@ function renderPpRequests() {
     });
 }
 
-async function approveRequest(reqId) {
+function approveRequest(reqId) {
     const req = betsRequests.find(r=>r.id===reqId);
     if (!req) return;
     req.status = 'approved';
-
-    // Update on server
-    await apiPost(`/api/requests/${reqId}`, {status: 'approved'});
-
+    // Pre-fill create form with request data
     switchPpTab('create');
     document.getElementById('pp-cat').value = req.category || 'custom';
     document.getElementById('pp-title').value = req.title || '';
     document.getElementById('pp-sub').value = req.participants || '';
     if (req.datetime) document.getElementById('pp-date').value = req.datetime.slice(0,16);
-    saveBetsDataLocal();
+    saveBetsData();
     showToast('Заявка одобрена — заполни коэффициенты и опубликуй');
 }
-
-async function rejectRequest(reqId) {
+function rejectRequest(reqId) {
     const req = betsRequests.find(r=>r.id===reqId);
     if (req) {
         req.status = 'rejected';
-        await apiPost(`/api/requests/${reqId}`, {status: 'rejected'});
+        // Update on server
+        fetch(`${API_BASE}/api/requests/${reqId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({status: 'rejected'})
+        }).catch(() => {});
     }
-    saveBetsDataLocal();
+    saveBetsData();
     renderPpRequests();
     showToast('Заявка отклонена');
 }
 
-async function partnerCreateEvent() {
+function partnerCreateEvent() {
     const title = document.getElementById('pp-title').value.trim();
     if (!title) { showToast('Введи название события'); return; }
 
@@ -5194,15 +5160,15 @@ async function partnerCreateEvent() {
         status: 'active',
         bets: []
     };
-
-    // Save to server first
-    const result = await apiPost('/api/events', ev);
-    if (result && result.success && result.eventId) {
-        ev.id = result.eventId; // Use server ID
-    }
-
     betsEvents.unshift(ev);
-    saveBetsDataLocal();
+    saveBetsData();
+
+    // Save to server
+    fetch(`${API_BASE}/api/events`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(ev)
+    }).catch(() => {});
 
     // Clear form
     ['pp-title','pp-sub','pp-date','pp-w1-name','pp-w2-name','pp-draw-name','pp-tl','pp-extra-name','pp-e1n','pp-e2n','pp-e3n'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
@@ -5264,11 +5230,11 @@ function openResolveModal(evId) {
 }
 function closeResolveModal() { document.getElementById('resolveModal').classList.remove('open'); resolveEventId = null; }
 
-async function confirmResolve() {
+function confirmResolve() {
     const ev = betsEvents.find(e=>e.id===resolveEventId);
     if (!ev) return;
     const markets = ev.markets || {};
-    const results = {};
+    const results = {}; // mk -> winning outIdx
     let allSet = true;
     Object.keys(markets).forEach(mk => {
         const sel = document.getElementById('resolve-'+mk)?.value;
@@ -5281,13 +5247,19 @@ async function confirmResolve() {
     ev.results = results;
 
     // Update on server
-    await apiPost(`/api/events/${ev.id}/resolve`, {results});
+    fetch(`${API_BASE}/api/events/${ev.id}/resolve`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({results})
+    }).catch(() => {});
 
     // Payout bets
     const mLen = Object.keys(markets).length;
     (ev.bets || []).forEach(b => {
+        // Find the myBet entry
         const bet = myBets.find(mb => mb.id === b.betId);
         if (!bet || bet.status !== 'active') return;
+        // Count correct markets for this event
         const eventItem = bet.items.find(i => i.eventId === ev.id);
         if (!eventItem) return;
         let correct = 0;
@@ -5298,7 +5270,9 @@ async function confirmResolve() {
         });
         const total = Object.keys(eventItem.markets).length;
         if (correct === total) {
+            // All correct — win full
             bet.status = 'won';
+            // Recalc potential using event's winMode
             const item = bet.items.find(i => i.eventId === ev.id);
             let payout = bet.potential;
             if (item && item.winMode === 'custom' && item.winMult > 1) {
@@ -5307,6 +5281,7 @@ async function confirmResolve() {
             addBalance && addBalance(Math.round(payout * STAR_UNIT), 'Выигрыш ставки');
             addHistory && addHistory('Ставка выиграна: ' + ev.title, '+' + payout + ' <i class="fas fa-star"></i>', 'green');
         } else if (correct >= Math.ceil(total / 2)) {
+            // >=50% correct — return stake
             bet.status = 'half';
             addBalance && addBalance(Math.round(bet.stake * STAR_UNIT), 'Возврат ставки (≥50% верно)');
             addHistory && addHistory('Частичный возврат: ' + ev.title, '+' + bet.stake + ' <i class="fas fa-star"></i>', 'orange');
@@ -5332,16 +5307,7 @@ function toggleWinMultiplier() {
 // ---- Init bets ----
 function initBets() {
     updateBetsStats();
-    // Load bets data from server
-    loadBetsData();
-
-    // Periodic refresh of events (every 10 seconds)
-    setInterval(() => {
-        if (document.getElementById('page-bets')?.classList.contains('active')) {
-            loadBetsData();
-        }
-    }, 10000);
-
+    // inject partner button into profile
     if (isPartner()) {
         const pActions = document.querySelector('.profile-actions');
         if (pActions && !document.getElementById('partner-panel-btn')) {
@@ -5363,6 +5329,7 @@ if (document.readyState === 'loading') {
     initBets();
 }
 
+</script>
 <!-- Market info popup -->
 <div class="market-info-popup" id="marketInfoPopup" onclick="closeMarketInfo(event)">
 <div class="market-info-box">
