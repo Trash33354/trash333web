@@ -519,6 +519,25 @@ body{font-family:'Montserrat',sans-serif;background:#050508;background-image:lin
 
 /* ===== REFERRAL ===== */
 .ref-card{background:linear-gradient(135deg,rgba(240,138,58,0.08),rgba(240,138,58,0.02));border:1px solid rgba(240,138,58,0.2);border-radius:28px;padding:2rem 1.5rem;text-align:center;margin-bottom:1.5rem;position:relative;overflow:hidden;backdrop-filter:blur(16px)}
+.ref-progress-wrap{margin-bottom:1.2rem;text-align:left}
+.ref-progress-labels{display:flex;justify-content:space-between;font-size:.62rem;color:var(--text-dim);margin-bottom:.4rem;letter-spacing:.3px}
+.ref-progress-labels span:last-child{color:var(--orange);font-weight:700}
+.ref-progress-bar{height:8px;border-radius:20px;background:rgba(255,255,255,.06);overflow:hidden;position:relative}
+.ref-progress-fill{height:100%;width:0%;border-radius:20px;background:linear-gradient(90deg,var(--orange),var(--orange-light));transition:width .6s cubic-bezier(.16,1,.3,1);position:relative;box-shadow:0 0 12px rgba(240,138,58,.5)}
+.ref-progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:refShine 2.2s ease-in-out infinite}
+@keyframes refShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.ref-week-card{border-radius:24px;padding:1.4rem 1.2rem 1.2rem;margin-bottom:1.5rem;text-align:left}
+.ref-week-title{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem}
+.ref-week-title i{color:var(--orange)}
+.streak-row{display:flex;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+.streak-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.streak-flame{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);color:var(--text-dim);transition:all .4s cubic-bezier(.16,1,.3,1)}
+.streak-day.filled .streak-flame{background:linear-gradient(145deg,var(--orange-light),var(--orange));border-color:transparent;color:#1a0e04;box-shadow:0 4px 16px rgba(240,138,58,.45);transform:scale(1.08)}
+.streak-day.today .streak-flame{box-shadow:0 0 0 3px rgba(240,138,58,.18),0 4px 16px rgba(240,138,58,.5)}
+.streak-day-label{font-size:.58rem;color:var(--text-dim);letter-spacing:.5px}
+.streak-day.today .streak-day-label{color:var(--orange);font-weight:700}
+.ref-week-summary{font-size:.68rem;color:var(--text-dim);line-height:1.5;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)}
+.ref-week-summary b{color:var(--text)}
 .ref-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
 .ref-stat{background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:1.2rem 0.8rem;text-align:center;backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);box-shadow:0 10px 35px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.05)}
 .ref-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;color:var(--orange)}
@@ -1061,17 +1080,6 @@ footer{
 .out-btn:hover{background:rgba(240,138,58,.1);border-color:rgba(240,138,58,.35)}
 .out-btn.selected{background:rgba(240,138,58,.18);border-color:var(--orange);box-shadow:0 3px 14px rgba(240,138,58,.2)}
 .out-btn.locked{opacity:.35;pointer-events:none}
-.bet-placed-banner{background:rgba(94,232,138,.08);border:1px solid rgba(94,232,138,.25);border-radius:12px;padding:.55rem .9rem;font-size:.68rem;color:var(--green);text-align:center;margin-bottom:.7rem;letter-spacing:.5px}
-.market-info-btn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--text-dim);font-size:.62rem;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:.4rem;transition:all .2s;font-style:italic;font-family:Georgia,serif}
-.market-info-btn:hover{background:rgba(240,138,58,.15);border-color:var(--orange);color:var(--orange)}
-.market-info-popup{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
-.market-info-popup.open{opacity:1;pointer-events:all}
-.market-info-box{background:linear-gradient(145deg,rgba(18,18,26,.98),rgba(10,10,16,.99));border:1px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:1.5rem 1.4rem 2rem;width:100%;max-width:480px}
-.market-info-box-title{font-size:.8rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:.8rem}
-.market-info-box-desc{font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:1rem}
-.market-info-box-outcomes{font-size:.72rem;color:var(--text-dim);line-height:1.7}
-.market-info-box-outcomes b{color:var(--text)}
-.market-info-close{width:100%;padding:.75rem;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;margin-top:.5rem}
 .out-label{font-size:.62rem;color:var(--text-dim);text-align:center;line-height:1.3}
 .out-kf{font-size:.88rem;font-weight:700;color:var(--orange)}
 .out-kf.selected{color:var(--text)}
@@ -1221,7 +1229,7 @@ footer{
 <i class="fas fa-star"></i>
 <span id="navBalance">0</span>
 </a>
-<a href="#" class="nav-link" data-page="bets"><i class="fas fa-chart-line"></i>Ставки</a>
+<a href="#" class="nav-link" data-page="referral"><i class="fas fa-users"></i>Рефералы</a>
 <a href="#" class="nav-link" data-page="profile"><i class="fas fa-user"></i>Профиль</a>
 </nav>
 
@@ -1391,9 +1399,21 @@ footer{
 <div class="ref-stat glass"><div class="ref-stat-num" id="refEarned">30.0</div><div class="ref-stat-label">Заработано</div></div>
 <div class="ref-stat glass"><div class="ref-stat-num" id="refAvailable">5.0</div><div class="ref-stat-label">Доступно</div></div>
 </div>
+<div class="ref-progress-wrap">
+<div class="ref-progress-labels"><span id="refProgressText">До след. уровня: 3 друга</span><span id="refProgressPct">0%</span></div>
+<div class="ref-progress-bar"><div class="ref-progress-fill" id="refProgressFill"></div></div>
+</div>
 <div class="ref-code" onclick="copyRef()" id="refCode">Загрузка...</div>
 <p style="color:var(--text-dim);font-size:0.75rem;margin-bottom:1.2rem">Нажми, чтобы скопировать</p>
-<button class="btn btn-orange btn-small" onclick="claimRef()" id="refClaimBtn"><i class="fas fa-wallet"></i> Забрать 5.0 <i class="fas fa-star"></i></button>
+<div style="display:flex;gap:.6rem">
+<button class="btn btn-orange btn-small" onclick="claimRef()" id="refClaimBtn" style="flex:1"><i class="fas fa-wallet"></i> Забрать 5.0 <i class="fas fa-star"></i></button>
+<button class="btn btn-outline btn-small" onclick="shareRef()" id="refShareBtn" style="flex:1"><i class="fas fa-paper-plane"></i> Поделиться</button>
+</div>
+</div>
+<div class="ref-week-card glass">
+<div class="ref-week-title"><i class="fas fa-fire"></i> Серия входов</div>
+<div class="streak-row" id="streakRow"></div>
+<div class="ref-week-summary" id="streakSummary">Загрузка...</div>
 </div>
 <div class="ref-list">
 <div class="ref-item"><div class="ref-avatar">A</div><div class="ref-info"><div class="ref-name">Артём</div><div class="ref-earn">Заработал 12.5 <i class="fas fa-star"></i></div></div><div class="ref-amount">+1.25</div></div>
@@ -1444,261 +1464,6 @@ footer{
 </section>
 </div>
 
-<!-- ===== BETS PAGE ===== -->
-<div class="page" id="page-bets">
-<section class="section" style="padding-top:1.2rem;padding-left:0;padding-right:0">
-
-<div style="padding:0 1.2rem .7rem">
-<span class="section-label"><i class="fas fa-chart-line"></i> Букмекер</span>
-<h2 class="section-title" style="font-size:1.9rem;margin-top:.3rem">Ставки</h2>
-</div>
-
-<!-- Stats -->
-<div class="bets-stats">
-<div class="bets-stat"><div class="bets-stat-val" id="bst-total">0</div><div class="bets-stat-lbl">Поставлено</div></div>
-<div class="bets-stat"><div class="bets-stat-val" id="bst-won">0</div><div class="bets-stat-lbl">Выиграно</div></div>
-<div class="bets-stat"><div class="bets-stat-val" id="bst-lost">0</div><div class="bets-stat-lbl">Проиграно</div></div>
-<div class="bets-stat"><div class="bets-stat-val" id="bst-profit">0</div><div class="bets-stat-lbl">Прибыль ★</div></div>
-<div class="bets-stat"><div class="bets-stat-val" id="bst-active">0</div><div class="bets-stat-lbl">Активных</div></div>
-</div>
-
-<!-- Sport tabs -->
-<div class="bets-sport-tabs">
-<div class="bst active" id="bst-tab-football" onclick="switchBetsTab('football')">⚽ Футбол</div>
-<div class="bst" id="bst-tab-boxing" onclick="switchBetsTab('boxing')">🥊 Бокс/MMA</div>
-<div class="bst" id="bst-tab-esports" onclick="switchBetsTab('esports')">🎮 Киберспорт</div>
-<div class="bst" id="bst-tab-custom" onclick="switchBetsTab('custom')">✨ Свободная</div>
-<div class="bst" id="bst-tab-mybets" onclick="switchBetsTab('mybets')">🎫 Мои ставки</div>
-</div>
-
-<!-- FOOTBALL -->
-<div class="bets-section active" id="bets-football">
-<div id="events-football"></div>
-<button class="btn btn-outline" style="margin-top:.3rem" onclick="openSuggestModal('football')"><i class="fas fa-plus-circle"></i> Предложить событие</button>
-</div>
-
-<!-- BOXING -->
-<div class="bets-section" id="bets-boxing">
-<div id="events-boxing"></div>
-<button class="btn btn-outline" style="margin-top:.3rem" onclick="openSuggestModal('boxing')"><i class="fas fa-plus-circle"></i> Предложить событие</button>
-</div>
-
-<!-- ESPORTS -->
-<div class="bets-section" id="bets-esports">
-<div id="events-esports"></div>
-<button class="btn btn-outline" style="margin-top:.3rem" onclick="openSuggestModal('esports')"><i class="fas fa-plus-circle"></i> Предложить событие</button>
-</div>
-
-<!-- CUSTOM -->
-<div class="bets-section" id="bets-custom">
-<div id="events-custom"></div>
-<div class="bets-empty" id="custom-empty-hint">
-<i class="fas fa-lightbulb"></i>
-<p>Знаешь интересное событие?<br>Предложи — партнёры установят коэффициенты</p>
-</div>
-<button class="btn btn-orange" onclick="openSuggestModal('custom')"><i class="fas fa-plus-circle"></i> Предложить событие</button>
-</div>
-
-<!-- MY BETS -->
-<div class="bets-section" id="bets-mybets" style="padding:0 1.2rem">
-<div id="mybets-list"></div>
-<div class="bets-empty" id="mybets-empty" style="display:none">
-<i class="fas fa-ticket-alt"></i>
-<p>Ставок пока нет.<br>Выбери событие и заполни все рынки!</p>
-</div>
-</div>
-
-</section>
-</div>
-
-<!-- Betslip float bar -->
-<div class="betslip-float hidden" id="betslipFloat">
-<div class="betslip-pill" onclick="openBetslip()">
-<div class="betslip-icon"><i class="fas fa-receipt"></i></div>
-<div class="betslip-pill-info">
-<div class="betslip-pill-title">Купон</div>
-<div class="betslip-pill-sub" id="bs-float-sub">Выбери все рынки</div>
-</div>
-<div class="betslip-pill-count" id="bs-float-count">0</div>
-</div>
-</div>
-
-<!-- Betslip modal -->
-<div class="bs-modal" id="bsModal" onclick="closeBsOnBg(event)">
-<div class="bs-modal-inner">
-<div class="bs-modal-hdr">
-<div class="bs-modal-title"><i class="fas fa-receipt" style="color:var(--orange);font-size:1.1rem;margin-right:.5rem"></i>Купон</div>
-<div class="bs-close" onclick="closeBetslip()"><i class="fas fa-times"></i></div>
-</div>
-<div id="bs-items"></div>
-<div id="bs-req-note" class="bs-req-note">Выбери исход в каждом рынке события чтобы сделать ставку</div>
-<div class="bs-stake-row">
-<span class="bs-stake-label">Ставка <i class="fas fa-star" style="font-size:.6rem;color:var(--orange)"></i></span>
-<input class="bs-stake-input" type="number" id="bs-stake" min="1" value="10" oninput="calcBetslip()">
-</div>
-<div class="bs-totals">
-<div class="bs-total-row"><span class="bs-total-label">Общий кэф</span><span class="bs-total-val" id="bs-total-kf">—</span></div>
-<div class="bs-total-row"><span class="bs-total-label">Выигрыш (все угадал)</span><span class="bs-total-val" id="bs-win-full">—</span></div>
-<div class="bs-total-row"><span class="bs-total-label">Ставка возвращается если ≥50%</span><span class="bs-total-val" id="bs-win-half">—</span></div>
-<div class="bs-total-row" style="margin-top:.3rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.05)"><span class="bs-total-label" style="color:var(--orange);font-size:.7rem">Потенциальный выигрыш</span><span class="bs-total-val big" id="bs-potential">0 ★</span></div>
-</div>
-<button class="btn btn-orange" id="bs-place-btn" onclick="placeBet()" style="margin-top:.9rem" disabled><i class="fas fa-check-circle"></i> Поставить</button>
-<button class="btn btn-outline" onclick="clearBetslip()" style="margin-top:.5rem;opacity:.5;font-size:.75rem"><i class="fas fa-trash"></i> Очистить купон</button>
-</div>
-</div>
-
-<!-- Suggest modal -->
-<div class="sg-modal" id="sgModal" onclick="closeSgOnBg(event)">
-<div class="sg-modal-inner">
-<div class="bs-modal-hdr">
-<div class="bs-modal-title"><i class="fas fa-plus-circle" style="color:var(--orange);font-size:1rem;margin-right:.5rem"></i>Предложить событие</div>
-<div class="bs-close" onclick="closeSuggestModal()"><i class="fas fa-times"></i></div>
-</div>
-<p style="font-size:.74rem;color:var(--text-dim);margin-bottom:1.1rem;line-height:1.6">Заявку рассмотрят партнёры — они установят коэффициенты и опубликуют. Обычно 1–3 ч.</p>
-<div class="sg-field"><label class="sg-label">Категория</label>
-<select class="sg-select" id="sg-cat">
-<option value="football">⚽ Футбол</option><option value="boxing">🥊 Бокс/MMA</option>
-<option value="esports">🎮 Киберспорт</option><option value="basketball">🏀 Баскетбол</option>
-<option value="hockey">🏒 Хоккей</option><option value="tennis">🎾 Теннис</option>
-<option value="crypto">₿ Крипта</option><option value="custom">✨ Свободная</option>
-</select></div>
-<div class="sg-field"><label class="sg-label">Название события</label><input class="sg-input" id="sg-title" placeholder="Например: Реал — Бавария"></div>
-<div class="sg-field"><label class="sg-label">Участники / что произойдёт</label><input class="sg-input" id="sg-participants" placeholder="Команды, игроки, описание события"></div>
-<div class="sg-field"><label class="sg-label">Дата и время</label><input class="sg-input" type="datetime-local" id="sg-date"></div>
-<div class="sg-field"><label class="sg-label">Турнир / лига / контекст</label><textarea class="sg-textarea" id="sg-desc" placeholder="Ла Лига, 30-й тур. Ссылка на источник..."></textarea></div>
-<div class="sg-field"><label class="sg-label">Предлагаемые исходы (опционально)</label>
-<div class="sg-grid2">
-<input class="sg-input" id="sg-o1" placeholder="Исход 1 (П1 / Да)">
-<input class="sg-input" id="sg-o2" placeholder="Исход 2 (П2 / Нет)">
-<input class="sg-input" id="sg-o3" placeholder="Исход 3 (Ничья)">
-<input class="sg-input" id="sg-src" placeholder="Источник кэфов">
-</div></div>
-<button class="btn btn-orange" onclick="submitSuggest()"><i class="fas fa-paper-plane"></i> Отправить партнёрам</button>
-</div>
-</div>
-
-<!-- Partner panel modal -->
-<div class="pp-modal" id="ppModal" onclick="closePpOnBg(event)">
-<div class="pp-modal-inner">
-<div class="bs-modal-hdr" style="margin-bottom:.8rem">
-<div class="bs-modal-title"><i class="fas fa-shield-halved" style="color:var(--orange);font-size:1rem;margin-right:.5rem"></i>Панель партнёра</div>
-<div class="bs-close" onclick="closePartnerPanel()"><i class="fas fa-times"></i></div>
-</div>
-<div class="pp-tabs">
-<div class="pp-tab active" id="pp-t-events" onclick="switchPpTab('events')">События</div>
-<div class="pp-tab" id="pp-t-create" onclick="switchPpTab('create')">Создать</div>
-<div class="pp-tab" id="pp-t-requests" onclick="switchPpTab('requests')">Заявки</div>
-<div class="pp-tab" id="pp-t-resolve" onclick="switchPpTab('resolve')">Завершить</div>
-</div>
-
-<!-- PP: Events list -->
-<div class="pp-section active" id="pp-events">
-<div id="pp-events-list"></div>
-</div>
-
-<!-- PP: Create event -->
-<div class="pp-section" id="pp-create">
-<div class="sg-field"><label class="sg-label">Категория</label>
-<select class="sg-select" id="pp-cat">
-<option value="football">⚽ Футбол</option><option value="boxing">🥊 Бокс/MMA</option>
-<option value="esports">🎮 Киберспорт</option><option value="basketball">🏀 Баскетбол</option>
-<option value="hockey">🏒 Хоккей</option><option value="tennis">🎾 Теннис</option>
-<option value="crypto">₿ Крипта</option><option value="custom">✨ Свободная</option>
-</select></div>
-<div class="sg-field"><label class="sg-label">Название события</label><input class="sg-input" id="pp-title" placeholder="Реал — Бавария"></div>
-<div class="sg-field"><label class="sg-label">Подзаголовок / лига</label><input class="sg-input" id="pp-sub" placeholder="Лига чемпионов · 1/2 финала"></div>
-<div class="sg-field"><label class="sg-label">Дата и время</label><input class="sg-input" type="datetime-local" id="pp-date"></div>
-<div class="sg-field"><label class="sg-label">LIVE?</label>
-<select class="sg-select" id="pp-live"><option value="0">Нет (Pre-match)</option><option value="1">Да (LIVE)</option></select></div>
-
-<div class="sg-field" style="background:rgba(240,138,58,.06);border:1px solid rgba(240,138,58,.2);border-radius:14px;padding:.8rem">
-<div style="font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:.4rem">💰 Выигрыш при угадывании всех рынков</div>
-<select class="sg-select" id="pp-win-mode" onchange="toggleWinMultiplier()">
-<option value="auto">Авто (ставка × произведение всех кэфов)</option>
-<option value="custom">Фиксированный множитель (задать вручную)</option>
-</select>
-<div id="pp-win-custom-wrap" style="display:none;margin-top:.6rem">
-<div class="sg-label">Множитель выигрыша (н-р 3 = ставка ×3)</div>
-<input class="sg-input" type="number" step="0.1" min="1.1" id="pp-win-mult" placeholder="н-р: 2.5">
-<div style="font-size:.62rem;color:var(--text-dim);margin-top:.35rem;line-height:1.5">≥50% верных рынков → возврат ставки · Меньше → проигрыш</div>
-</div>
-<div id="pp-win-auto-hint" style="font-size:.62rem;color:var(--text-dim);margin-top:.4rem;line-height:1.5">Система сама перемножит все выбранные кэфы. ≥50% верных → возврат ставки · Меньше → проигрыш</div>
-</div>
-
-<div style="margin:.8rem 0 .5rem;font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);font-weight:700">Рынки и коэффициенты</div>
-
-<!-- Market: Winner -->
-<div class="sg-field" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.8rem">
-<div style="font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem;font-weight:600">🏆 Победитель</div>
-<div class="sg-grid2">
-<div><div class="sg-label">П1</div><input class="sg-input" id="pp-w1-name" placeholder="Реал Мадрид"><input class="sg-input" id="pp-w1-kf" type="number" step="0.01" placeholder="Кэф (1.85)" style="margin-top:.4rem"></div>
-<div><div class="sg-label">П2</div><input class="sg-input" id="pp-w2-name" placeholder="Бавария"><input class="sg-input" id="pp-w2-kf" type="number" step="0.01" placeholder="Кэф (3.20)" style="margin-top:.4rem"></div>
-<div><div class="sg-label">Ничья / нет победителя</div><input class="sg-input" id="pp-draw-name" placeholder="Ничья"><input class="sg-input" id="pp-draw-kf" type="number" step="0.01" placeholder="Кэф (3.40)" style="margin-top:.4rem"></div>
-</div></div>
-
-<!-- Market: Total -->
-<div class="sg-field" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.8rem;margin-top:.5rem">
-<div style="font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem;font-weight:600">📊 Тотал</div>
-<div class="sg-grid2">
-<div><div class="sg-label">Линия (н-р 2.5)</div><input class="sg-input" id="pp-tl" type="number" step="0.5" placeholder="2.5"></div>
-<div></div>
-<div><div class="sg-label">ТБ кэф</div><input class="sg-input" id="pp-tb-kf" type="number" step="0.01" placeholder="1.90"></div>
-<div><div class="sg-label">ТМ кэф</div><input class="sg-input" id="pp-tm-kf" type="number" step="0.01" placeholder="1.85"></div>
-</div></div>
-
-<!-- Market: Handicap -->
-<div class="sg-field" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.8rem;margin-top:.5rem">
-<div style="font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem;font-weight:600">⚖️ Фора</div>
-<div class="sg-grid2">
-<div><div class="sg-label">Фора 1</div><input class="sg-input" id="pp-h1" type="number" step="0.5" placeholder="-1.5"></div>
-<div><div class="sg-label">Кэф Ф1</div><input class="sg-input" id="pp-h1-kf" type="number" step="0.01" placeholder="2.05"></div>
-<div><div class="sg-label">Фора 2</div><input class="sg-input" id="pp-h2" type="number" step="0.5" placeholder="+1.5"></div>
-<div><div class="sg-label">Кэф Ф2</div><input class="sg-input" id="pp-h2-kf" type="number" step="0.01" placeholder="1.80"></div>
-</div></div>
-
-<!-- Market: Both score -->
-<div class="sg-field" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.8rem;margin-top:.5rem">
-<div style="font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem;font-weight:600">⚡ Дополнительный рынок</div>
-<div class="sg-field"><label class="sg-label">Название рынка</label><input class="sg-input" id="pp-extra-name" placeholder="Обе забьют / Метод победы / Раунд..."></div>
-<div class="sg-grid2">
-<div><div class="sg-label">Вар. 1 название</div><input class="sg-input" id="pp-e1n" placeholder="Да / КО / Раунд 1..."></div>
-<div><div class="sg-label">Вар. 1 кэф</div><input class="sg-input" id="pp-e1k" type="number" step="0.01" placeholder="1.75"></div>
-<div><div class="sg-label">Вар. 2 название</div><input class="sg-input" id="pp-e2n" placeholder="Нет / По очкам..."></div>
-<div><div class="sg-label">Вар. 2 кэф</div><input class="sg-input" id="pp-e2k" type="number" step="0.01" placeholder="2.00"></div>
-<div><div class="sg-label">Вар. 3 (опц.)</div><input class="sg-input" id="pp-e3n" placeholder="Ничья..."></div>
-<div><div class="sg-label">Вар. 3 кэф</div><input class="sg-input" id="pp-e3k" type="number" step="0.01" placeholder=""></div>
-</div></div>
-
-<button class="btn btn-orange" onclick="partnerCreateEvent()" style="margin-top:.8rem"><i class="fas fa-plus"></i> Опубликовать событие</button>
-</div>
-
-<!-- PP: Requests from users -->
-<div class="pp-section" id="pp-requests">
-<p style="font-size:.73rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.5">Заявки от пользователей. Одобри и добавь коэффициенты или отклони.</p>
-<div id="pp-requests-list"></div>
-<div id="pp-req-empty" class="bets-empty" style="display:none"><i class="fas fa-inbox"></i><p>Новых заявок нет</p></div>
-</div>
-
-<!-- PP: Resolve events -->
-<div class="pp-section" id="pp-resolve">
-<p style="font-size:.73rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.5">Завершить событие: введи результат, система подсчитает выигрыши автоматически.</p>
-<div id="pp-resolve-list"></div>
-</div>
-</div>
-</div>
-
-<!-- Resolve event form modal -->
-<div class="resolve-modal" id="resolveModal">
-<div class="resolve-inner">
-<div class="bs-modal-hdr" style="margin-bottom:1rem">
-<div class="bs-modal-title" style="font-size:1.2rem"><i class="fas fa-flag-checkered" style="color:var(--orange);margin-right:.5rem"></i>Завершить событие</div>
-<div class="bs-close" onclick="closeResolveModal()"><i class="fas fa-times"></i></div>
-</div>
-<div id="resolve-event-title" style="font-size:.85rem;font-weight:600;margin-bottom:1rem;color:var(--text-dim)"></div>
-<div id="resolve-fields"></div>
-<button class="btn btn-orange" onclick="confirmResolve()" style="margin-top:.8rem"><i class="fas fa-check"></i> Подтвердить результат</button>
-</div>
-</div>
 
 </main>
 
@@ -1934,10 +1699,6 @@ function showLoadingError(msg) {
 
 function applyUserData() {
     if (!userData) return;
-    // Init bets system now that we have userId
-    if (typeof initBetsDelayed === 'function' && userId) {
-        initBetsDelayed();
-    }
     // Hide loading overlay
     const loader = document.getElementById('loadingOverlay');
     if (loader) loader.classList.add('hidden');
@@ -1977,6 +1738,7 @@ function applyUserData() {
     // Referrals
     if (userData.referrals !== undefined) {
         document.getElementById('refCount').textContent = userData.referrals;
+        updateRefMilestone(userData.referrals);
     }
     if (userData.refs_earned !== undefined) {
         document.getElementById('refEarned').textContent = userData.refs_earned.toFixed(1);
@@ -2000,7 +1762,7 @@ function applyUserData() {
 
     // Login streak
     if (userData.login_streak !== undefined) {
-        // Could display streak somewhere if needed
+        renderStreak(userData.login_streak);
     }
 
     // Ref code
@@ -2254,6 +2016,86 @@ function copyRef() {
     const code = document.getElementById('refCode').textContent;
     navigator.clipboard.writeText(code).then(() => { showToast('Код скопирован!'); playSound('click'); });
 }
+
+function shareRef() {
+    initAudio();
+    const code = document.getElementById('refCode').textContent;
+    const text = 'Залетай на TRASH333 — забирай бесплатные Telegram Stars! 🔥';
+    try {
+        if (window.tg && tg.openTelegramLink) {
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(code)}&text=${encodeURIComponent(text)}`);
+            playSound('click');
+            return;
+        }
+    } catch(e) {}
+    if (navigator.share) {
+        navigator.share({ title: 'TRASH333', text, url: code }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(code).then(() => showToast('Ссылка скопирована — отправь другу!'));
+    }
+    playSound('click');
+}
+
+// Rank tiers based on referral count — just for fun, doesn't affect payouts
+const REF_TIERS = [
+    { min: 0,  name: 'Новичок',    icon: 'fa-seedling' },
+    { min: 3,  name: 'Амбассадор', icon: 'fa-rocket' },
+    { min: 10, name: 'Легенда',    icon: 'fa-crown' },
+    { min: 25, name: 'Магнат',     icon: 'fa-gem' },
+];
+function updateRefMilestone(count) {
+    let tierIdx = 0;
+    for (let i = 0; i < REF_TIERS.length; i++) { if (count >= REF_TIERS[i].min) tierIdx = i; }
+    const tier = REF_TIERS[tierIdx];
+    const next = REF_TIERS[tierIdx + 1];
+
+    const fill = document.getElementById('refProgressFill');
+    const text = document.getElementById('refProgressText');
+    const pct = document.getElementById('refProgressPct');
+    if (!fill || !text || !pct) return;
+    if (!next) {
+        fill.style.width = '100%';
+        text.textContent = 'Максимальный уровень!';
+        pct.textContent = '🔥';
+        return;
+    }
+    const span = next.min - tier.min;
+    const progress = Math.min(1, (count - tier.min) / span);
+    fill.style.width = (progress * 100).toFixed(0) + '%';
+    pct.textContent = (progress * 100).toFixed(0) + '%';
+    const left = next.min - count;
+    text.textContent = `До «${next.name}»: ${left} ${left === 1 ? 'друг' : (left >= 2 && left <= 4 ? 'друга' : 'друзей')}`;
+}
+
+// Streak of daily check-ins — uses the real login_streak field from the
+// server (already sent, just wasn't shown anywhere before). No fake data.
+function renderStreak(streakCount) {
+    const row = document.getElementById('streakRow');
+    const summaryEl = document.getElementById('streakSummary');
+    if (!row) return;
+    const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    const jsDay = new Date().getDay(); // 0 = Sunday
+    const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
+
+    // Show the 7-day window ending today; fill in the last N days of the streak.
+    row.innerHTML = days.map((d, i) => {
+        const daysAgo = (todayIdx - i + 7) % 7;
+        const filled = daysAgo < streakCount;
+        const isToday = i === todayIdx;
+        return `
+        <div class="streak-day${filled ? ' filled' : ''}${isToday ? ' today' : ''}">
+            <div class="streak-flame"><i class="fas ${filled ? 'fa-fire' : 'fa-circle'}" style="${filled ? '' : 'font-size:.4rem'}"></i></div>
+            <div class="streak-day-label">${d}</div>
+        </div>`;
+    }).join('');
+
+    if (summaryEl) {
+        summaryEl.innerHTML = streakCount > 0
+            ? `Серия: <b>${streakCount} ${streakCount === 1 ? 'день' : (streakCount >= 2 && streakCount <= 4 ? 'дня' : 'дней')} подряд</b> — заходи и завтра, чтобы не потерять!`
+            : 'Заходи каждый день, чтобы начать серию и получать больше бонусов';
+    }
+}
+
 function claimRef() {
     initAudio();
     if (refAvailable <= 0) { showToast('Нет доступных средств'); return; }
@@ -2266,6 +2108,7 @@ function claimRef() {
                 balance = data.balance;
                 updateBalance();
                 spawnCoins();
+                spawnParticles && spawnParticles(window.innerWidth/2, window.innerHeight/2);
                 refAvailable = 0;
                 document.getElementById('refAvailable').textContent = '0.0';
                 btn.innerHTML = '<i class="fas fa-check"></i> Забрано';
@@ -4388,993 +4231,7 @@ function endTower(silent) {
     towerRunning = false;
 }
 
-// ============================================================
-// BETTING SYSTEM
-// ============================================================
-
-// ---- Data stores ----
-let betsEvents = [];
-let betsRequests = [];
-let myBets = [];
-let placedEvents = new Set(); // per-user! only THIS user's placed bets
-
-// Load from server first, fallback to localStorage
-async function loadBetsData() {
-    try {
-        const evRes = await fetch(`${API_BASE}/api/events`);
-        if (evRes.ok) {
-            const data = await evRes.json();
-            if (data.events) betsEvents = data.events;
-        } else {
-            betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
-        }
-    } catch(e) {
-        betsEvents = JSON.parse(localStorage.getItem('trash_events') || '[]');
-    }
-
-    try {
-        const reqRes = await fetch(`${API_BASE}/api/requests`);
-        if (reqRes.ok) {
-            const data = await reqRes.json();
-            if (data.requests) betsRequests = data.requests;
-        } else {
-            betsRequests = JSON.parse(localStorage.getItem('trash_requests') || '[]');
-        }
-    } catch(e) {
-        betsRequests = JSON.parse(localStorage.getItem('trash_requests') || '[]');
-    }
-
-    if (userId) {
-        try {
-            const betsRes = await fetch(`${API_BASE}/api/user/${userId}/bets`);
-            if (betsRes.ok) {
-                const data = await betsRes.json();
-                if (data.bets) myBets = data.bets;
-            } else {
-                myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
-            }
-        } catch(e) {
-            myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
-        }
-
-        // Load placed events for THIS USER ONLY from server
-        // Server must return only events THIS user has bet on
-        try {
-            const peRes = await fetch(`${API_BASE}/api/user/${userId}/placed-events`);
-            if (peRes.ok) {
-                const data = await peRes.json();
-                if (data.events) placedEvents = new Set(data.events);
-                else placedEvents = new Set();
-            } else {
-                // Fallback: derive from myBets (only active bets)
-                placedEvents = new Set();
-                myBets.filter(b => b.status === 'active').forEach(b => {
-                    b.items.forEach(item => placedEvents.add(item.eventId));
-                });
-            }
-        } catch(e) {
-            placedEvents = new Set();
-            myBets.filter(b => b.status === 'active').forEach(b => {
-                b.items.forEach(item => placedEvents.add(item.eventId));
-            });
-        }
-    } else {
-        myBets = JSON.parse(localStorage.getItem('trash_mybets') || '[]');
-        placedEvents = new Set();
-    }
-
-    // Refresh UI if on bets page
-    const activeTab = document.querySelector('.bets-section.active');
-    if (activeTab) {
-        const tab = activeTab.id.replace('bets-', '');
-        if (tab === 'mybets') renderMyBets();
-        else renderEventsForTab(tab);
-    }
-    updateBetsStats();
-}
-
-// Call load on init
-// Delayed init — wait for userId to be loaded from API
-function initBetsDelayed() {
-    // Clean slate: derive placedEvents from myBets only (personal)
-    placedEvents = new Set();
-    myBets.filter(b => b.status === 'active').forEach(b => {
-        b.items.forEach(item => placedEvents.add(item.eventId));
-    });
-    loadBetsData();
-    // Refresh every 10 seconds when on bets page
-    setInterval(() => {
-        if (document.getElementById('page-bets')?.classList.contains('active')) {
-            loadBetsData();
-        }
-    }, 10000);
-}
-// Call after user data is loaded (or immediately if no userId needed)
-if (userId) initBetsDelayed();
-else {
-    // Wait for loadUserData to set userId, then init
-    const checkInterval = setInterval(() => {
-        if (userId) {
-            clearInterval(checkInterval);
-            initBetsDelayed();
-        }
-    }, 500);
-    // Fallback: init anyway after 3 seconds even without userId
-    setTimeout(() => {
-        clearInterval(checkInterval);
-        if (!userId) loadBetsData(); // load from localStorage fallback
-    }, 3000);
-}
-
-function savePlacedEvents() {
-    localStorage.setItem('trash_placed_events', JSON.stringify([...placedEvents]));
-}
-
-const MARKET_INFO = {
-    'winner': {
-        desc: 'Выбери команду или исход, который победит в этом матче.',
-        outcomes: 'П1 — победа первой команды\nНичья — ничья\nП2 — победа второй команды'
-    },
-    'total': {
-        desc: 'Угадай, сколько голов/очков/сетов будет забито за весь матч.',
-        outcomes: 'Больше (ТБ) — итоговый счёт превысит указанную цифру\nМеньше (ТМ) — итоговый счёт будет ниже указанной цифры'
-    },
-    'handicap': {
-        desc: 'Фора выравнивает шансы: одной команде добавляют преимущество, другой — убирают.',
-        outcomes: 'Ф1(−1) — первая команда должна победить с разницей больше 1\nФ2(+1) — второй достаточно не проиграть больше чем на 1'
-    },
-    'extra': {
-        desc: 'Дополнительный рынок с особым условием — читай описание варианта.',
-        outcomes: 'Каждый вариант описан в кнопке — выбери тот, в который веришь'
-    }
-};
-
-function showMarketInfo(mk, name, outcomes) {
-    const info = MARKET_INFO[mk] || { desc: 'Выбери исход, в который веришь больше всего.', outcomes: '' };
-    document.getElementById('marketInfoTitle').textContent = name;
-    document.getElementById('marketInfoDesc').textContent = info.desc;
-    const outEl = document.getElementById('marketInfoOutcomes');
-    if (outcomes && outcomes.length) {
-        outEl.innerHTML = outcomes.map(o => `<b>${o.label}</b> — кэф ${o.kf.toFixed(2)}<br>`).join('');
-    } else {
-        outEl.innerHTML = info.outcomes.split('\n').map(l => `${l}<br>`).join('');
-    }
-    document.getElementById('marketInfoPopup').classList.add('open');
-}
-
-function closeMarketInfo(e) {
-    if (e.target === document.getElementById('marketInfoPopup')) {
-        document.getElementById('marketInfoPopup').classList.remove('open');
-    }
-}
-// betslip: { eventId, markets: { marketId: {label, outcome, kf} } }
-let betslip = {};
-
-function saveBetsData() {
-    localStorage.setItem('trash_events', JSON.stringify(betsEvents));
-    localStorage.setItem('trash_requests', JSON.stringify(betsRequests));
-    localStorage.setItem('trash_mybets', JSON.stringify(myBets.slice(0,100)));
-}
-
-// ---- Sport tab ----
-function switchBetsTab(tab) {
-    document.querySelectorAll('.bst').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.bets-section').forEach(s => s.classList.remove('active'));
-    const t = document.getElementById('bst-tab-' + tab);
-    const s = document.getElementById('bets-' + tab);
-    if (t) t.classList.add('active');
-    if (s) s.classList.add('active');
-    if (tab === 'mybets') renderMyBets();
-    else renderEventsForTab(tab);
-}
-
-// ---- Render events for a tab ----
-const SPORT_LABELS = {football:'⚽ Футбол',boxing:'🥊 Бокс/MMA',esports:'🎮 Киберспорт',basketball:'🏀 Баскетбол',hockey:'🏒 Хоккей',tennis:'🎾 Теннис',crypto:'₿ Крипта',custom:'✨ Свободная'};
-
-function renderEventsForTab(tab) {
-    const container = document.getElementById('events-' + tab);
-    if (!container) return;
-    const evs = betsEvents.filter(e => e.category === tab && e.status === 'active');
-    container.innerHTML = '';
-    if (evs.length === 0) {
-        container.innerHTML = '<div class="bets-empty"><i class="fas fa-calendar-times"></i><p>Активных событий нет.<br>Предложи своё ниже!</p></div>';
-        return;
-    }
-    evs.forEach(ev => container.appendChild(buildEventCard(ev)));
-    // hide empty hint for custom
-    const hint = document.getElementById('custom-empty-hint');
-    if (hint) hint.style.display = evs.length > 0 ? 'none' : 'block';
-}
-
-function buildEventCard(ev) {
-    const markets = ev.markets || {};
-    const mKeys = Object.keys(markets);
-    const isPlaced = placedEvents.has(ev.id);
-    const bs = isPlaced ? {} : (betslip[ev.id] || {});
-    const filled = mKeys.filter(k => bs[k]);
-    const total = mKeys.length;
-    const pct = total ? Math.round(filled.length / total * 100) : 0;
-    const allFilled = filled.length === total && total > 0;
-
-    const card = document.createElement('div');
-    card.className = 'bet-card' + (allFilled ? ' all-filled' : '');
-    card.id = 'evcard-' + ev.id;
-
-    let metaHtml = `<span class="bet-cat-badge">${SPORT_LABELS[ev.category] || ev.category}</span>`;
-    if (ev.live) metaHtml += `<span class="bet-live-badge"><i class="fas fa-circle" style="font-size:.4rem"></i> LIVE</span>`;
-    if (ev.datetime) {
-        const d = new Date(ev.datetime);
-        metaHtml += `<span class="bet-card-time"><i class="fas fa-clock" style="font-size:.6rem"></i> ${ev.live ? '' : d.toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>`;
-    }
-
-    let marketsHtml = '';
-    mKeys.forEach(mk => {
-        const m = markets[mk];
-        const sel = bs[mk];
-        marketsHtml += buildMarketHtml(ev.id, mk, m, sel, isPlaced);
-    });
-
-    card.innerHTML = `
-        <div class="bet-card-meta">${metaHtml}</div>
-        <div class="bet-card-title">${ev.title}</div>
-        <div class="bet-card-sub">${ev.sub || ''}</div>
-        ${isPlaced ? '<div class="bet-placed-banner"><i class="fas fa-check-circle"></i> Ставка на это событие уже сделана</div>' : `<div class="bet-progress"><div class="bet-progress-bar"><div class="bet-progress-fill" style="width:${pct}%"></div></div><div class="bet-progress-label">${filled.length}/${total} рынков выбрано</div></div>`}
-        ${marketsHtml}
-    `;
-    return card;
-}
-
-function buildMarketHtml(evId, mk, m, sel, isPlaced) {
-    const outcomes = m.outcomes || [];
-    let outHtml = '';
-    const cols = outcomes.length === 2 ? 'cols2' : outcomes.length === 3 ? 'cols3' : 'cols2';
-    outcomes.forEach((o, i) => {
-        const isSel = sel && sel.outIdx === i;
-        const lockedClass = isPlaced ? ' locked' : '';
-        outHtml += `<div class="out-btn${isSel?' selected':''}${lockedClass}" ${isPlaced ? '' : `onclick="selectOutcome('${evId}','${mk}',${i},'${o.label}',${o.kf})"`} id="out-${evId}-${mk}-${i}">
-            <span class="out-label">${o.label}</span>
-            <span class="out-kf${isSel?' selected':''}">${o.kf.toFixed(2)}</span>
-        </div>`;
-    });
-    const outcomesData = JSON.stringify(m.outcomes||[]).replace(/'/g,"\\'");
-    return `<div class="bet-market">
-        <div class="bet-market-divider"></div>
-        <div class="bet-market-hdr" onclick="toggleMarketBlock('mb-${evId}-${mk}','mchev-${evId}-${mk}')">
-            <span class="bet-market-name">${m.name}</span>
-            <span style="display:flex;align-items:center;gap:.4rem;margin-left:auto">
-                <span class="market-info-btn" onclick="event.stopPropagation();showMarketInfo('${mk}','${m.name}',${JSON.stringify(m.outcomes||[])})">i</span>
-                <i class="fas fa-chevron-down bet-market-chev open" id="mchev-${evId}-${mk}"></i>
-            </span>
-        </div>
-        <div class="bet-market-body open" id="mb-${evId}-${mk}">
-            <div class="outcomes-grid ${cols}">${outHtml}</div>
-        </div>
-    </div>`;
-}
-
-function toggleMarketBlock(bodyId, chevId) {
-    const b = document.getElementById(bodyId);
-    const c = document.getElementById(chevId);
-    if (!b) return;
-    b.classList.toggle('open');
-    if (c) c.classList.toggle('open');
-}
-
-// ---- Select outcome ----
-function selectOutcome(evId, mk, outIdx, label, kf) {
-    if (!betslip[evId]) betslip[evId] = {};
-    const prev = betslip[evId][mk];
-    if (prev && prev.outIdx === outIdx) {
-        // deselect
-        delete betslip[evId][mk];
-        document.getElementById(`out-${evId}-${mk}-${outIdx}`)?.classList.remove('selected');
-    } else {
-        // deselect previous in same market
-        if (prev !== undefined) {
-            document.getElementById(`out-${evId}-${mk}-${prev.outIdx}`)?.classList.remove('selected');
-        }
-        betslip[evId][mk] = { outIdx, label, kf };
-        document.getElementById(`out-${evId}-${mk}-${outIdx}`)?.classList.add('selected');
-    }
-    refreshCardProgress(evId);
-    updateBetslipFloat();
-    playSound && playSound('click');
-}
-
-function refreshCardProgress(evId) {
-    const ev = betsEvents.find(e => e.id === evId);
-    if (!ev) return;
-    const markets = ev.markets || {};
-    const mKeys = Object.keys(markets);
-    const bs = betslip[evId] || {};
-    const filled = mKeys.filter(k => bs[k]).length;
-    const total = mKeys.length;
-    const pct = total ? Math.round(filled / total * 100) : 0;
-    const allFilled = filled === total && total > 0;
-    const card = document.getElementById('evcard-' + evId);
-    if (!card) return;
-    card.classList.toggle('all-filled', allFilled);
-    const bar = card.querySelector('.bet-progress-fill');
-    const lbl = card.querySelector('.bet-progress-label');
-    if (bar) bar.style.width = pct + '%';
-    if (lbl) lbl.textContent = filled + '/' + total + ' рынков выбрано';
-}
-
-// ---- Betslip float ----
-function updateBetslipFloat() {
-    const fl = document.getElementById('betslipFloat');
-    const countEl = document.getElementById('bs-float-count');
-    const subEl = document.getElementById('bs-float-sub');
-    // count events with at least 1 selection
-    const evIds = Object.keys(betslip).filter(id => Object.keys(betslip[id]).length > 0);
-    if (evIds.length === 0) { fl.classList.add('hidden'); return; }
-    fl.classList.remove('hidden');
-    // count total selections
-    let total = 0, filled = 0;
-    evIds.forEach(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        if (!ev) return;
-        const mLen = Object.keys(ev.markets || {}).length;
-        const sel = Object.keys(betslip[id]).length;
-        total += mLen; filled += sel;
-    });
-    countEl.textContent = evIds.length;
-    subEl.textContent = filled + '/' + total + ' рынков · нажми чтобы поставить';
-}
-
-// ---- Betslip modal ----
-function openBetslip() {
-    renderBsItems();
-    calcBetslip();
-    document.getElementById('bsModal').classList.add('open');
-}
-function closeBetslip() { document.getElementById('bsModal').classList.remove('open'); }
-function closeBsOnBg(e) { if (e.target === document.getElementById('bsModal')) closeBetslip(); }
-
-function renderBsItems() {
-    const cont = document.getElementById('bs-items');
-    cont.innerHTML = '';
-    const evIds = Object.keys(betslip).filter(id => Object.keys(betslip[id]).length > 0);
-    evIds.forEach(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        if (!ev) return;
-        const markets = ev.markets || {};
-        const mKeys = Object.keys(markets);
-        const bs = betslip[id];
-        const filled = mKeys.filter(k => bs[k]);
-        const allFilled = filled.length === mKeys.length && mKeys.length > 0;
-
-        let marketsHtml = '';
-        mKeys.forEach(mk => {
-            const sel = bs[mk];
-            marketsHtml += `<div class="mybet-market-row">
-                <span class="mybet-market-name">${markets[mk].name}</span>
-                <span class="mybet-market-choice">${sel ? sel.label + ' <span style="color:var(--orange)">x' + sel.kf.toFixed(2) + '</span>' : '<span style="color:var(--red)">— не выбрано</span>'}</span>
-            </div>`;
-        });
-
-        const div = document.createElement('div');
-        div.className = 'bs-item';
-        div.innerHTML = `
-            <div class="bs-item-top">
-                <div class="bs-item-info"><div class="bs-item-event">${ev.title}</div><div class="bs-item-market">${SPORT_LABELS[ev.category]||ev.category} · ${filled.length}/${mKeys.length} рынков</div></div>
-                ${allFilled ? '<span style="color:var(--green);font-size:.7rem"><i class="fas fa-check-circle"></i> Готово</span>' : '<span style="color:var(--red);font-size:.7rem"><i class="fas fa-times-circle"></i> Не все</span>'}
-            </div>
-            <div class="mybet-markets">${marketsHtml}</div>`;
-        cont.appendChild(div);
-    });
-}
-
-function calcBetslip() {
-    const evIds = Object.keys(betslip).filter(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        if (!ev) return false;
-        const mKeys = Object.keys(ev.markets || {});
-        return mKeys.length > 0 && mKeys.every(k => betslip[id][k]);
-    });
-    const stake = parseFloat(document.getElementById('bs-stake').value) || 0;
-    const reqNote = document.getElementById('bs-req-note');
-    const placeBtn = document.getElementById('bs-place-btn');
-
-    if (evIds.length === 0) {
-        reqNote.className = 'bs-req-note';
-        reqNote.textContent = 'Выбери исход в каждом рынке события чтобы сделать ставку';
-        reqNote.style.display = 'block';
-        placeBtn.disabled = true;
-        document.getElementById('bs-total-kf').textContent = '—';
-        document.getElementById('bs-win-full').textContent = '—';
-        document.getElementById('bs-win-half').textContent = '—';
-        document.getElementById('bs-potential').textContent = '0 ★';
-        return;
-    }
-
-    // Check if ALL selected events are fully filled
-    const allEvIds = Object.keys(betslip).filter(id => Object.keys(betslip[id]).length > 0);
-    const notFull = allEvIds.filter(id => !evIds.includes(id));
-    if (notFull.length > 0) {
-        reqNote.className = 'bs-req-note error';
-        reqNote.textContent = '⚠️ Не все рынки заполнены в некоторых событиях. Заполни все или убери незавершённые.';
-        reqNote.style.display = 'block';
-        placeBtn.disabled = true;
-        return;
-    }
-
-    reqNote.style.display = 'none';
-    placeBtn.disabled = false;
-
-    // Calc total kf — use event's winMode
-    // For single event bets use that event's setting; for multi-event use product
-    let totalKf = 1;
-    evIds.forEach(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        if (ev && ev.winMode === 'custom' && ev.winMult > 1) {
-            totalKf *= ev.winMult;
-        } else {
-            Object.values(betslip[id]).forEach(sel => { totalKf *= sel.kf; });
-        }
-    });
-    totalKf = Math.round(totalKf * 100) / 100;
-    const winFull = Math.round(stake * totalKf * 100) / 100;
-    document.getElementById('bs-total-kf').textContent = 'x' + totalKf;
-    document.getElementById('bs-win-full').textContent = winFull + ' ★';
-    document.getElementById('bs-win-half').textContent = stake + ' ★ (возврат)';
-    document.getElementById('bs-potential').textContent = winFull + ' ★';
-}
-
-// ---- Place bet ----
-function placeBet() {
-    const stake = parseFloat(document.getElementById('bs-stake').value) || 0;
-    if (stake <= 0) { showToast('Введи сумму ставки'); return; }
-    const stakeCents = Math.round(stake * STAR_UNIT);
-    if (balance < stakeCents) { showToast('Недостаточно звёзд!'); return; }
-
-    const evIds = Object.keys(betslip).filter(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        if (!ev) return false;
-        const mKeys = Object.keys(ev.markets || {});
-        return mKeys.length > 0 && mKeys.every(k => betslip[id][k]);
-    });
-    if (evIds.length === 0) return;
-
-    subBalance(stakeCents);
-
-    let totalKf = 1;
-    const betItems = [];
-    evIds.forEach(id => {
-        const ev = betsEvents.find(e => e.id === id);
-        const markets = {};
-        Object.entries(betslip[id]).forEach(([mk, sel]) => {
-            if (!(ev.winMode === 'custom' && ev.winMult > 1)) totalKf *= sel.kf;
-            markets[mk] = { name: (ev.markets[mk]||{}).name, outcome: sel.label, kf: sel.kf };
-        });
-        if (ev.winMode === 'custom' && ev.winMult > 1) totalKf *= ev.winMult;
-        betItems.push({ eventId: id, eventTitle: ev.title, category: ev.category, markets, winMode: ev.winMode, winMult: ev.winMult });
-    });
-    totalKf = Math.round(totalKf * 100) / 100;
-    const potential = Math.round(stake * totalKf * 100) / 100;
-
-    const bet = {
-        id: 'b' + Date.now(),
-        date: new Date().toISOString(),
-        items: betItems,
-        stake,
-        totalKf,
-        potential,
-        status: 'active' // active | won | lost | half
-    };
-    myBets.unshift(bet);
-
-    // Save to server
-    if (userId) {
-        fetch(`${API_BASE}/api/user/${userId}/bets`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({bet})
-        }).catch(() => {});
-    }
-
-    // Register bet on event for later payout
-    betItems.forEach(item => {
-        const ev = betsEvents.find(e => e.id === item.eventId);
-        if (ev) {
-            if (!ev.bets) ev.bets = [];
-            ev.bets.push({ betId: bet.id, markets: item.markets, stake, potential });
-        }
-    });
-
-    // Запоминаем что на эти события уже поставлено
-    betItems.forEach(item => placedEvents.add(item.eventId));
-    savePlacedEvents();
-
-    saveBetsData();
-    updateBetsStats();
-
-    clearBetslip();
-    closeBetslip();
-    addHistory && addHistory('Ставка: ' + (betItems.length > 1 ? 'Экспресс' : betItems[0].eventTitle), '-' + stake + ' <i class="fas fa-star"></i>', 'red');
-    showToast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Ставка принята!');
-    spawnParticles && spawnParticles(window.innerWidth/2, window.innerHeight/2);
-}
-
-function clearBetslip() {
-    betslip = {};
-    // Re-render current tab to clear selections
-    const activeTab = document.querySelector('.bets-section.active');
-    if (activeTab) {
-        const tab = activeTab.id.replace('bets-', '');
-        if (tab !== 'mybets') renderEventsForTab(tab);
-    }
-    updateBetslipFloat();
-}
-
-// ---- My bets ----
-function renderMyBets() {
-    const list = document.getElementById('mybets-list');
-    const empty = document.getElementById('mybets-empty');
-    if (!list) return;
-    list.innerHTML = '';
-    if (myBets.length === 0) { empty.style.display='block'; return; }
-    empty.style.display = 'none';
-    myBets.forEach(bet => {
-        const card = document.createElement('div');
-        card.className = 'mybet-card ' + bet.status;
-        const statusLabel = {active:'⏳ Ожидание',won:'✅ Выиграл',lost:'❌ Проиграл',half:'↩️ Возврат ставки'}[bet.status]||bet.status;
-        let itemsHtml = '';
-        bet.items.forEach(item => {
-            itemsHtml += `<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:.25rem;font-weight:500">${item.eventTitle}</div>`;
-            Object.values(item.markets).forEach(m => {
-                itemsHtml += `<div class="mybet-market-row" style="margin-left:.5rem"><span class="mybet-market-name">${m.name}</span><span class="mybet-market-choice">${m.outcome} <span style="color:var(--orange)">x${m.kf}</span></span></div>`;
-            });
-        });
-        card.innerHTML = `
-            <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
-                <span style="font-size:.62rem;color:var(--text-dim)">${new Date(bet.date).toLocaleString('ru')}</span>
-                <span class="mybet-status ${bet.status}">${statusLabel}</span>
-            </div>
-            <div class="mybet-markets">${itemsHtml}</div>
-            <div class="mybet-footer">
-                <span style="font-size:.7rem;color:var(--text-dim)">Ставка: <b style="color:var(--text)">${bet.stake} ★</b> · Кэф: <b style="color:var(--orange)">x${bet.totalKf}</b></span>
-                <span style="font-size:.7rem;${bet.status==='won'?'color:var(--green)':bet.status==='half'?'color:var(--orange)':'color:var(--text-dim)'}">${bet.status==='won'?'+'+bet.potential+' ★':bet.status==='half'?'↩ '+bet.stake+' ★':'Потенциал: '+bet.potential+' ★'}</span>
-            </div>`;
-        list.appendChild(card);
-    });
-}
-
-// ---- Stats ----
-function updateBetsStats() {
-    const total = myBets.length;
-    const won = myBets.filter(b=>b.status==='won').length;
-    const lost = myBets.filter(b=>b.status==='lost').length;
-    const active = myBets.filter(b=>b.status==='active').length;
-    const profit = myBets.filter(b=>b.status==='won').reduce((a,b)=>a+b.potential-b.stake,0)
-                 - myBets.filter(b=>b.status==='lost').reduce((a,b)=>a+b.stake,0);
-    const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-    set('bst-total',total); set('bst-won',won); set('bst-lost',lost);
-    set('bst-profit',profit.toFixed(1)); set('bst-active',active);
-}
-
-// ---- Suggest event ----
-function openSuggestModal(cat) {
-    const s = document.getElementById('sg-cat');
-    if (s && cat) s.value = cat;
-    document.getElementById('sgModal').classList.add('open');
-}
-function closeSuggestModal() { document.getElementById('sgModal').classList.remove('open'); }
-function closeSgOnBg(e) { if (e.target===document.getElementById('sgModal')) closeSuggestModal(); }
-
-function submitSuggest() {
-    const title = document.getElementById('sg-title').value.trim();
-    const participants = document.getElementById('sg-participants').value.trim();
-    if (!title || !participants) { showToast('Заполни название и участников!'); return; }
-    const req = {
-        id: 'r' + Date.now(),
-        category: document.getElementById('sg-cat').value,
-        title, participants,
-        datetime: document.getElementById('sg-date').value,
-        desc: document.getElementById('sg-desc').value,
-        outcomes: [
-            document.getElementById('sg-o1').value,
-            document.getElementById('sg-o2').value,
-            document.getElementById('sg-o3').value,
-        ].filter(Boolean),
-        src: document.getElementById('sg-src').value,
-        status: 'pending',
-        date: new Date().toISOString()
-    };
-    betsRequests.unshift(req);
-    saveBetsData();
-
-    // Save to server
-    fetch(`${API_BASE}/api/requests`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(req)
-    }).catch(() => {});
-
-    closeSuggestModal();
-    ['sg-title','sg-participants','sg-date','sg-desc','sg-o1','sg-o2','sg-o3','sg-src'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    showToast('<i class="fas fa-paper-plane" style="color:var(--orange)"></i> Заявка отправлена партнёрам!');
-    spawnParticles && spawnParticles(window.innerWidth/2, window.innerHeight/2);
-}
-
-// ---- Partner panel ----
-function openPartnerPanel() {
-    if (!isPartner()) return;
-    renderPpEvents();
-    renderPpRequests();
-    renderPpResolve();
-    document.getElementById('ppModal').classList.add('open');
-}
-function closePartnerPanel() { document.getElementById('ppModal').classList.remove('open'); }
-function closePpOnBg(e) { if (e.target===document.getElementById('ppModal')) closePartnerPanel(); }
-
-function switchPpTab(tab) {
-    document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.pp-section').forEach(s=>s.classList.remove('active'));
-    document.getElementById('pp-t-'+tab)?.classList.add('active');
-    document.getElementById('pp-'+tab)?.classList.add('active');
-    if (tab==='events') renderPpEvents();
-    if (tab==='requests') renderPpRequests();
-    if (tab==='resolve') renderPpResolve();
-}
-
-function renderPpEvents() {
-    const list = document.getElementById('pp-events-list');
-    if (!list) return;
-    list.innerHTML = '';
-    if (betsEvents.length === 0) { list.innerHTML = '<div class="bets-empty"><i class="fas fa-calendar"></i><p>Событий нет. Создай первое!</p></div>'; return; }
-    [...betsEvents].forEach(ev => {
-        const statusClass = {active:'pp-status-active',pending:'pp-status-pending',finished:'pp-status-finished'}[ev.status]||'';
-        const statusLabel = {active:'Активно',pending:'Ожидание',finished:'Завершено'}[ev.status]||ev.status;
-        const div = document.createElement('div');
-        div.className = 'pp-event-card';
-        div.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem">
-                <div class="pp-event-title">${ev.title}</div>
-                <span class="pp-status-badge ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="pp-event-meta">${SPORT_LABELS[ev.category]||ev.category}${ev.sub?' · '+ev.sub:''} ${ev.datetime?'· '+new Date(ev.datetime).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</div>
-            <div style="font-size:.65rem;color:var(--text-dim);margin-bottom:.7rem">Ставок: ${(ev.bets||[]).length} · Рынков: ${Object.keys(ev.markets||{}).length}</div>
-            <div class="pp-event-actions">
-                ${ev.status==='active'?`<span class="pp-btn pp-btn-orange" onclick="toggleEventLive('${ev.id}')"><i class="fas fa-circle"></i> ${ev.live?'Убрать LIVE':'Поставить LIVE'}</span>`:''}
-                ${ev.status==='active'?`<span class="pp-btn pp-btn-green" onclick="openResolveModal('${ev.id}')"><i class="fas fa-flag-checkered"></i> Завершить</span>`:''}
-                <span class="pp-btn pp-btn-red" onclick="deleteEvent('${ev.id}')"><i class="fas fa-trash"></i> Удалить</span>
-            </div>`;
-        list.appendChild(div);
-    });
-}
-
-function toggleEventLive(evId) {
-    const ev = betsEvents.find(e=>e.id===evId);
-    if (!ev) return;
-    ev.live = !ev.live;
-    saveBetsData();
-
-    // Update on server
-    fetch(`${API_BASE}/api/events/${evId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({live: ev.live})
-    }).catch(() => {});
-
-    renderPpEvents();
-    renderEventsForCurrentTab();
-}
-function deleteEvent(evId) {
-    if (!confirm('Удалить событие?')) return;
-    betsEvents = betsEvents.filter(e=>e.id!==evId);
-    saveBetsData();
-
-    // Delete from server
-    fetch(`${API_BASE}/api/events/${evId}`, {method: 'DELETE'}).catch(() => {});
-
-    renderPpEvents();
-    renderEventsForCurrentTab();
-}
-
-function renderPpRequests() {
-    const list = document.getElementById('pp-requests-list');
-    const empty = document.getElementById('pp-req-empty');
-    if (!list) return;
-    list.innerHTML = '';
-    const pending = betsRequests.filter(r=>r.status==='pending');
-    if (pending.length===0) { if(empty) empty.style.display='block'; return; }
-    if(empty) empty.style.display='none';
-    pending.forEach(req => {
-        const div = document.createElement('div');
-        div.className = 'pp-event-card';
-        div.innerHTML = `
-            <div class="pp-event-title" style="margin-bottom:.25rem">${req.title}</div>
-            <div class="pp-event-meta">${SPORT_LABELS[req.category]||req.category} · ${req.participants}</div>
-            ${req.datetime?`<div style="font-size:.62rem;color:var(--text-dim);margin-bottom:.3rem">📅 ${new Date(req.datetime).toLocaleString('ru')}</div>`:''}
-            ${req.desc?`<div style="font-size:.65rem;color:var(--text-dim);margin-bottom:.5rem;line-height:1.4">${req.desc}</div>`:''}
-            ${req.outcomes.length?`<div style="font-size:.62rem;color:var(--text-dim);margin-bottom:.6rem">Предл. исходы: ${req.outcomes.join(' / ')}</div>`:''}
-            <div class="pp-event-actions">
-                <span class="pp-btn pp-btn-green" onclick="approveRequest('${req.id}')"><i class="fas fa-check"></i> Одобрить → Создать событие</span>
-                <span class="pp-btn pp-btn-red" onclick="rejectRequest('${req.id}')"><i class="fas fa-times"></i> Отклонить</span>
-            </div>`;
-        list.appendChild(div);
-    });
-}
-
-function approveRequest(reqId) {
-    const req = betsRequests.find(r=>r.id===reqId);
-    if (!req) return;
-    req.status = 'approved';
-    // Pre-fill create form with request data
-    switchPpTab('create');
-    document.getElementById('pp-cat').value = req.category || 'custom';
-    document.getElementById('pp-title').value = req.title || '';
-    document.getElementById('pp-sub').value = req.participants || '';
-    if (req.datetime) document.getElementById('pp-date').value = req.datetime.slice(0,16);
-    saveBetsData();
-    showToast('Заявка одобрена — заполни коэффициенты и опубликуй');
-}
-function rejectRequest(reqId) {
-    const req = betsRequests.find(r=>r.id===reqId);
-    if (req) {
-        req.status = 'rejected';
-        // Update on server
-        fetch(`${API_BASE}/api/requests/${reqId}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({status: 'rejected'})
-        }).catch(() => {});
-    }
-    saveBetsData();
-    renderPpRequests();
-    showToast('Заявка отклонена');
-}
-
-function partnerCreateEvent() {
-    const title = document.getElementById('pp-title').value.trim();
-    if (!title) { showToast('Введи название события'); return; }
-
-    const markets = {};
-
-    // Winner market
-    const w1n = document.getElementById('pp-w1-name').value.trim();
-    const w2n = document.getElementById('pp-w2-name').value.trim();
-    const w1k = parseFloat(document.getElementById('pp-w1-kf').value);
-    const w2k = parseFloat(document.getElementById('pp-w2-kf').value);
-    if (w1n && w2n && w1k > 1 && w2k > 1) {
-        const outcomes = [{label:w1n,kf:w1k},{label:w2n,kf:w2k}];
-        const drN = document.getElementById('pp-draw-name').value.trim();
-        const drK = parseFloat(document.getElementById('pp-draw-kf').value);
-        if (drN && drK > 1) outcomes.push({label:drN,kf:drK});
-        markets['winner'] = { name: '🏆 Победитель', outcomes };
-    }
-
-    // Total market
-    const tl = document.getElementById('pp-tl').value;
-    const tbk = parseFloat(document.getElementById('pp-tb-kf').value);
-    const tmk = parseFloat(document.getElementById('pp-tm-kf').value);
-    if (tl && tbk > 1 && tmk > 1) {
-        markets['total'] = { name: `📊 Тотал (${tl})`, outcomes: [
-            {label:'ТБ '+tl, kf:tbk},
-            {label:'ТМ '+tl, kf:tmk}
-        ]};
-    }
-
-    // Handicap
-    const h1 = document.getElementById('pp-h1').value;
-    const h2 = document.getElementById('pp-h2').value;
-    const h1k = parseFloat(document.getElementById('pp-h1-kf').value);
-    const h2k = parseFloat(document.getElementById('pp-h2-kf').value);
-    if (h1 && h2 && h1k > 1 && h2k > 1) {
-        markets['handicap'] = { name: '⚖️ Форы', outcomes: [
-            {label: 'Ф1 ('+h1+')', kf:h1k},
-            {label: 'Ф2 ('+h2+')', kf:h2k}
-        ]};
-    }
-
-    // Extra market
-    const en = document.getElementById('pp-extra-name').value.trim();
-    const e1n = document.getElementById('pp-e1n').value.trim();
-    const e1k = parseFloat(document.getElementById('pp-e1k').value);
-    const e2n = document.getElementById('pp-e2n').value.trim();
-    const e2k = parseFloat(document.getElementById('pp-e2k').value);
-    if (en && e1n && e2n && e1k > 1 && e2k > 1) {
-        const outc = [{label:e1n,kf:e1k},{label:e2n,kf:e2k}];
-        const e3n = document.getElementById('pp-e3n').value.trim();
-        const e3k = parseFloat(document.getElementById('pp-e3k').value);
-        if (e3n && e3k > 1) outc.push({label:e3n,kf:e3k});
-        markets['extra'] = { name: '⚡ ' + en, outcomes: outc };
-    }
-
-    if (Object.keys(markets).length === 0) { showToast('Заполни хотя бы один рынок с кэфами!'); return; }
-
-    const ev = {
-        id: 'ev' + Date.now(),
-        category: document.getElementById('pp-cat').value,
-        title,
-        sub: document.getElementById('pp-sub').value.trim(),
-        datetime: document.getElementById('pp-date').value,
-        live: document.getElementById('pp-live').value === '1',
-        winMode: document.getElementById('pp-win-mode').value,
-        winMult: parseFloat(document.getElementById('pp-win-mult').value) || null,
-        markets,
-        status: 'active',
-        bets: []
-    };
-    betsEvents.unshift(ev);
-    saveBetsData();
-
-    // Save to server
-    fetch(`${API_BASE}/api/events`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(ev)
-    }).catch(() => {});
-
-    // Clear form
-    ['pp-title','pp-sub','pp-date','pp-w1-name','pp-w2-name','pp-draw-name','pp-tl','pp-extra-name','pp-e1n','pp-e2n','pp-e3n'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    ['pp-w1-kf','pp-w2-kf','pp-draw-kf','pp-tb-kf','pp-tm-kf','pp-h1','pp-h2','pp-h1-kf','pp-h2-kf','pp-e1k','pp-e2k','pp-e3k'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    document.getElementById('pp-live').value = '0';
-
-    renderPpEvents();
-    renderEventsForCurrentTab();
-    showToast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Событие опубликовано!');
-    spawnParticles && spawnParticles(window.innerWidth/2, 200);
-}
-
-function renderEventsForCurrentTab() {
-    const activeTab = document.querySelector('.bets-section.active');
-    if (!activeTab) return;
-    const tab = activeTab.id.replace('bets-', '');
-    if (tab !== 'mybets') renderEventsForTab(tab);
-}
-
-// ---- Resolve ----
-function renderPpResolve() {
-    const list = document.getElementById('pp-resolve-list');
-    if (!list) return;
-    list.innerHTML = '';
-    const active = betsEvents.filter(e=>e.status==='active');
-    if (active.length===0) { list.innerHTML='<div class="bets-empty"><i class="fas fa-check-double"></i><p>Нет активных событий для завершения</p></div>'; return; }
-    active.forEach(ev => {
-        const div = document.createElement('div');
-        div.className = 'pp-event-card';
-        div.innerHTML = `
-            <div class="pp-event-title">${ev.title}</div>
-            <div class="pp-event-meta">${SPORT_LABELS[ev.category]||ev.category} · Ставок: ${(ev.bets||[]).length}</div>
-            <div class="pp-event-actions" style="margin-top:.6rem">
-                <span class="pp-btn pp-btn-green" onclick="openResolveModal('${ev.id}')"><i class="fas fa-flag-checkered"></i> Завершить и подвести итог</span>
-            </div>`;
-        list.appendChild(div);
-    });
-}
-
-let resolveEventId = null;
-function openResolveModal(evId) {
-    const ev = betsEvents.find(e=>e.id===evId);
-    if (!ev) return;
-    resolveEventId = evId;
-    document.getElementById('resolve-event-title').textContent = ev.title;
-    const fields = document.getElementById('resolve-fields');
-    fields.innerHTML = '';
-    Object.entries(ev.markets||{}).forEach(([mk, m]) => {
-        const div = document.createElement('div');
-        div.style.cssText = 'margin-bottom:1rem';
-        div.innerHTML = `<div class="sg-label" style="margin-bottom:.5rem">${m.name}</div>
-        <select class="sg-select" id="resolve-${mk}">
-            <option value="">— Выбери победивший исход —</option>
-            ${(m.outcomes||[]).map((o,i)=>`<option value="${i}">${o.label} (x${o.kf})</option>`).join('')}
-        </select>`;
-        fields.appendChild(div);
-    });
-    document.getElementById('resolveModal').classList.add('open');
-}
-function closeResolveModal() { document.getElementById('resolveModal').classList.remove('open'); resolveEventId = null; }
-
-function confirmResolve() {
-    const ev = betsEvents.find(e=>e.id===resolveEventId);
-    if (!ev) return;
-    const markets = ev.markets || {};
-    const results = {}; // mk -> winning outIdx
-    let allSet = true;
-    Object.keys(markets).forEach(mk => {
-        const sel = document.getElementById('resolve-'+mk)?.value;
-        if (sel === '' || sel === undefined) { allSet = false; }
-        else results[mk] = parseInt(sel);
-    });
-    if (!allSet) { showToast('Выбери результат для каждого рынка!'); return; }
-
-    ev.status = 'finished';
-    ev.results = results;
-
-    // Update on server
-    fetch(`${API_BASE}/api/events/${ev.id}/resolve`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({results})
-    }).catch(() => {});
-
-    // Payout bets
-    const mLen = Object.keys(markets).length;
-    (ev.bets || []).forEach(b => {
-        // Find the myBet entry
-        const bet = myBets.find(mb => mb.id === b.betId);
-        if (!bet || bet.status !== 'active') return;
-        // Count correct markets for this event
-        const eventItem = bet.items.find(i => i.eventId === ev.id);
-        if (!eventItem) return;
-        let correct = 0;
-        Object.entries(eventItem.markets).forEach(([mk, sel]) => {
-            const winOutIdx = results[mk];
-            const winLabel = (markets[mk].outcomes[winOutIdx]||{}).label;
-            if (sel.outcome === winLabel) correct++;
-        });
-        const total = Object.keys(eventItem.markets).length;
-        if (correct === total) {
-            // All correct — win full
-            bet.status = 'won';
-            // Recalc potential using event's winMode
-            const item = bet.items.find(i => i.eventId === ev.id);
-            let payout = bet.potential;
-            if (item && item.winMode === 'custom' && item.winMult > 1) {
-                payout = Math.round(bet.stake * item.winMult * 100) / 100;
-            }
-            addBalance && addBalance(Math.round(payout * STAR_UNIT), 'Выигрыш ставки');
-            addHistory && addHistory('Ставка выиграна: ' + ev.title, '+' + payout + ' <i class="fas fa-star"></i>', 'green');
-        } else if (correct >= Math.ceil(total / 2)) {
-            // >=50% correct — return stake
-            bet.status = 'half';
-            addBalance && addBalance(Math.round(bet.stake * STAR_UNIT), 'Возврат ставки (≥50% верно)');
-            addHistory && addHistory('Частичный возврат: ' + ev.title, '+' + bet.stake + ' <i class="fas fa-star"></i>', 'orange');
-        } else {
-            bet.status = 'lost';
-        }
-    });
-
-    saveBetsData();
-    updateBetsStats();
-    closeResolveModal();
-    closePartnerPanel();
-    renderEventsForCurrentTab();
-    showToast('<i class="fas fa-flag-checkered" style="color:var(--green)"></i> Событие завершено, выигрыши начислены!');
-}
-
-function toggleWinMultiplier() {
-    const mode = document.getElementById('pp-win-mode').value;
-    document.getElementById('pp-win-custom-wrap').style.display = mode === 'custom' ? 'block' : 'none';
-    document.getElementById('pp-win-auto-hint').style.display = mode === 'custom' ? 'none' : 'block';
-}
-
-// ---- Init bets ----
-function initBets() {
-    updateBetsStats();
-    // inject partner button into profile
-    if (isPartner()) {
-        const pActions = document.querySelector('.profile-actions');
-        if (pActions && !document.getElementById('partner-panel-btn')) {
-            const btn = document.createElement('button');
-            btn.id = 'partner-panel-btn';
-            btn.className = 'btn btn-outline';
-            btn.style.cssText = 'margin-top:.5rem;border-color:rgba(240,138,58,.4);color:var(--orange)';
-            btn.innerHTML = '<i class="fas fa-shield-halved"></i> Панель партнёра';
-            btn.onclick = openPartnerPanel;
-            pActions.appendChild(btn);
-        }
-    }
-}
-
-// Call init after DOM ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBets);
-} else {
-    initBets();
-}
 
 </script>
-<!-- Market info popup -->
-<div class="market-info-popup" id="marketInfoPopup" onclick="closeMarketInfo(event)">
-<div class="market-info-box">
-<div class="market-info-box-title" id="marketInfoTitle"></div>
-<div class="market-info-box-desc" id="marketInfoDesc"></div>
-<div class="market-info-box-outcomes" id="marketInfoOutcomes"></div>
-<button class="market-info-close" onclick="document.getElementById('marketInfoPopup').classList.remove('open')">Понятно</button>
-</div>
-</div>
 </body>
 </html>
